@@ -10,10 +10,37 @@ import FirebaseFirestoreSwift
 
 struct Book: Identifiable, Codable {
     @DocumentID var id: String?
-    var title = ""
-    var author = ""
+    var title: String
+    var author: String
+    var description: String?
+    var publishedDate: String?
+    var imageUrl: String?
     
-    var dictionary: [String: Any] {
-        return ["title": title, "author": author]
+    init(id: String? = nil,
+         title: String = "",
+         author: String = "Unknown Author",
+         description: String? = nil,
+         publishedDate: String? = nil,
+         imageUrl: String? = nil) {
+        self.id = id
+        self.title = title
+        self.author = author
+        self.description = description
+        self.publishedDate = publishedDate
+        self.imageUrl = imageUrl
     }
 }
+
+extension Book {
+    var dictionary: [String: Any] {
+        return [
+            "title": title,
+            "author": author,
+            "description": description ?? "",
+            "publishedDate": publishedDate ?? "",
+            "imageUrl": imageUrl ?? ""
+        ]
+    }
+}
+
+
