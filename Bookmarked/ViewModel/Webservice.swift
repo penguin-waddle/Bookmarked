@@ -13,6 +13,12 @@ enum NetworkError: Error {
     case decodingError(Error)
 }
 
+extension String {
+    func trimmed() -> String {
+        self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
 class Webservice {
     
     func getBooks(searchTerm: String, country: String) async throws -> [GoogleBookItem] {
@@ -22,7 +28,7 @@ class Webservice {
         components.host = "www.googleapis.com"
         components.path = "/books/v1/volumes"
         components.queryItems = [
-            URLQueryItem(name: "q", value: searchTerm),
+            URLQueryItem(name: "q", value: searchTerm.trimmed()),
             URLQueryItem(name: "key", value: "AIzaSyCGVqKsuNzdzBXQE5BcKfX_xkinEKFkRYg"),
             URLQueryItem(name: "country", value: country)
         ]

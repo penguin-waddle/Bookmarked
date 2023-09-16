@@ -17,12 +17,14 @@
 		1E65A3FE2A9D6C7500F23AE4 /* Webservice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */; };
 		1E65A4002A9D7ABC00F23AE4 /* ResultsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E65A3FF2A9D7ABC00F23AE4 /* ResultsViewModel.swift */; };
 		1E8B6F4B2A9683A800EAB91A /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B6F4A2A9683A800EAB91A /* Book.swift */; };
-		1E8B6F4D2A9684CA00EAB91A /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B6F4C2A9684CA00EAB91A /* BookDetailView.swift */; };
+		1E8B6F4D2A9684CA00EAB91A /* BookSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B6F4C2A9684CA00EAB91A /* BookSearchView.swift */; };
 		1E8B6F4F2A9699ED00EAB91A /* BookViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8B6F4E2A9699ED00EAB91A /* BookViewModel.swift */; };
 		1E95BDA42A9540FE005B4D0D /* BookmarkedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E95BDA32A9540FE005B4D0D /* BookmarkedApp.swift */; };
 		1E95BDA62A9540FE005B4D0D /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E95BDA52A9540FE005B4D0D /* LoginView.swift */; };
 		1E95BDA82A9540FF005B4D0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E95BDA72A9540FF005B4D0D /* Assets.xcassets */; };
 		1E95BDAC2A9540FF005B4D0D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */; };
+		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
+		1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,7 +35,7 @@
 		1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Webservice.swift; sourceTree = "<group>"; };
 		1E65A3FF2A9D7ABC00F23AE4 /* ResultsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsViewModel.swift; sourceTree = "<group>"; };
 		1E8B6F4A2A9683A800EAB91A /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
-		1E8B6F4C2A9684CA00EAB91A /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
+		1E8B6F4C2A9684CA00EAB91A /* BookSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchView.swift; sourceTree = "<group>"; };
 		1E8B6F4E2A9699ED00EAB91A /* BookViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookViewModel.swift; sourceTree = "<group>"; };
 		1E95BDA02A9540FE005B4D0D /* Bookmarked.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmarked.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E95BDA32A9540FE005B4D0D /* BookmarkedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedApp.swift; sourceTree = "<group>"; };
@@ -41,6 +43,7 @@
 		1E95BDA72A9540FF005B4D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1E95BDA92A9540FF005B4D0D /* Bookmarked.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Bookmarked.entitlements; sourceTree = "<group>"; };
 		1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */,
 				1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */,
 				1E5BCBCA2A95505F00C0A1D6 /* FirebaseStorage in Frameworks */,
 				1E5BCBC62A95505F00C0A1D6 /* FirebaseFirestore in Frameworks */,
@@ -120,7 +124,8 @@
 		1EDFAFCD2A9932A9004F3AE3 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				1E8B6F4C2A9684CA00EAB91A /* BookDetailView.swift */,
+				1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */,
+				1E8B6F4C2A9684CA00EAB91A /* BookSearchView.swift */,
 				1E5BCBCD2A958C2A00C0A1D6 /* ListView.swift */,
 				1E95BDA52A9540FE005B4D0D /* LoginView.swift */,
 			);
@@ -148,6 +153,7 @@
 				1E5BCBC52A95505F00C0A1D6 /* FirebaseFirestore */,
 				1E5BCBC72A95505F00C0A1D6 /* FirebaseFirestoreSwift */,
 				1E5BCBC92A95505F00C0A1D6 /* FirebaseStorage */,
+				1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */,
 			);
 			productName = Bookmarked;
 			productReference = 1E95BDA02A9540FE005B4D0D /* Bookmarked.app */;
@@ -179,6 +185,7 @@
 			mainGroup = 1E95BD972A9540FE005B4D0D;
 			packageReferences = (
 				1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = 1E95BDA12A9540FE005B4D0D /* Products */;
 			projectDirPath = "";
@@ -209,9 +216,10 @@
 			files = (
 				1E8B6F4B2A9683A800EAB91A /* Book.swift in Sources */,
 				1E95BDA62A9540FE005B4D0D /* LoginView.swift in Sources */,
+				1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */,
 				1E65A3FE2A9D6C7500F23AE4 /* Webservice.swift in Sources */,
 				1E65A4002A9D7ABC00F23AE4 /* ResultsViewModel.swift in Sources */,
-				1E8B6F4D2A9684CA00EAB91A /* BookDetailView.swift in Sources */,
+				1E8B6F4D2A9684CA00EAB91A /* BookSearchView.swift in Sources */,
 				1E95BDA42A9540FE005B4D0D /* BookmarkedApp.swift in Sources */,
 				1E5BCBCE2A958C2A00C0A1D6 /* ListView.swift in Sources */,
 				1E65A3FC2A9D392800F23AE4 /* GoogleBooksResponse.swift in Sources */,
@@ -443,6 +451,14 @@
 				minimumVersion = 10.0.0;
 			};
 		};
+		1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -465,6 +481,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

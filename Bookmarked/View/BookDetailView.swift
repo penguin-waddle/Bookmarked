@@ -2,106 +2,105 @@
 //  BookDetailView.swift
 //  Bookmarked
 //
-//  Created by Vivien on 8/23/23.
+//  Created by Vivien on 9/14/23.
 //
 
 import SwiftUI
-
-struct SearchBar: View {
-    @Binding var text: String
-
-    var body: some View {
-        HStack {
-            TextField("Searching for...", text: $text)
-                .padding(7)
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-        }
-        .padding(.horizontal, 10)
-    }
-}
+import SDWebImageSwiftUI
 
 struct BookDetailView: View {
-    @EnvironmentObject var bookVM: BookViewModel
-    @State var book: Book
-    @Environment(\.dismiss) private var dismiss
+    var book: Book
     
-    @State private var searchText: String = ""
-    @StateObject private var resultsListVM = ResultsListViewModel()
-    
+    @State private var isDescriptionExpanded = false
+
     var body: some View {
-            NavigationView {
-                VStack {
-                    SearchBar(text: $searchText)
-                        .padding(.horizontal)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                
+                HStack(alignment: .top) {
+                    // Display the cover image if the imageUrl is available
+                    if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
+                        WebImage(url: url)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100)
+                            .cornerRadius(10)
+                    }
                     
-                    List(resultsListVM.books, id: \.id) { resultViewModel in
-                        HStack {
-                            // Check and fetch the thumbnail
-                            if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
-                                AsyncImage(url: url) { image in
-                                    image.resizable()
-                                        .scaledToFit()
-                                } placeholder: {
-                                    ProgressView()
-                                }
-                                .frame(width: 50, height: 80)
-                            } else {
-                                Rectangle()
-                                    .fill(Color.gray)
-                                    .frame(width: 50, height: 80)
-                            }
-                            
-                            VStack(alignment: .leading) {
-                                Text(resultViewModel.title)
-                                Text(resultViewModel.authors)
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                            }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(book.title)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        Text("By \(book.author)")
+                            .font(.title2)
+                            .foregroundColor(.secondary)
+                        
+                        if let publishedDate = book.publishedDate {
+                            Text("Published on \(formatDate(publishedDate))")
+                                .font(.callout)
+                                .foregroundColor(.secondary)
                         }
-                        .onTapGesture {
-                            selectBook(from: resultViewModel.book)
+
+                    }
+                    .padding(.leading, 16)
+                }
+                .padding()
+
+                Divider()
+                    .padding(.vertical, 16)
+
+                if let description = book.description {
+                    Group {
+                        if isDescriptionExpanded || description.split(separator: " ").count <= 50 {
+                            Text(description)
+                        } else {
+                            Text(String(description.prefix(300)) + "...") // Show first 300 characters as an example, adjust as needed
                         }
                     }
-                    .listStyle(.plain)
-                    .onChange(of: searchText) { value in
-                        Task {
-                            if !value.isEmpty && value.count > 3 {
-                                await resultsListVM.search(name: value)
-                            } else {
-                                resultsListVM.books.removeAll()
+                    .padding(.horizontal)
+                    
+                    if description.split(separator: " ").count > 50 {
+                        Button(action: {
+                            withAnimation {
+                                isDescriptionExpanded.toggle()
                             }
+                        }) {
+                            Text(isDescriptionExpanded ? "Read Less" : "Read More")
+                                .foregroundColor(.blue)
                         }
+                        .padding(.horizontal)
                     }
                 }
+                
             }
-            .navigationTitle("Books")
-            .navigationBarTitleDisplayMode(.inline)
         }
+        .font(.custom("PingFangTC-Regular", size: 16))
+    }
+    
+    func formatDate(_ dateString: String) -> String {
+        // Create a date formatter to parse the date string
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd" // Assuming the original format is this
 
-    func selectBook(from book: Book) {
-        // Since you already have a book instance, you can bypass the conversion.
-        // Use BookViewModel to save this book to Firestore
-        Task {
-            let success = await bookVM.saveBook(book: book)
-            if success {
-                print("Success adding book!")
-                // Dismiss the detail view
-                dismiss()
-            } else {
-                print("Error saving book!")
-            }
+        // Check if we can create a Date object from the string
+        if let date = inputFormatter.date(from: dateString) {
+            // Format the date object to the desired format
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "MMMM dd, yyyy"
+            return outputFormatter.string(from: date)
+        } else {
+            // If we cannot create a Date object, return the original string
+            return dateString
         }
     }
-
 
 }
 
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationStack {
-            BookDetailView(book: Book())
-                .environmentObject(BookViewModel())
-        }
+        BookDetailView(book: Book(title: "Sample Title", author: "Sample Author", description: "This is a sample description for a sample book. The story revolves around ...", publishedDate: "2023", imageUrl: nil))
     }
 }
+
+

@@ -51,9 +51,7 @@ struct ListView: View {
                 }
             }
             .sheet(isPresented: $sheetIsPresented) {
-                NavigationStack {
-                    BookDetailView(book: Book())
-                }
+                BookSearchView(book: Book())
             }
         }
     }
