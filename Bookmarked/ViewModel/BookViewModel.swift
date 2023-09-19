@@ -8,6 +8,8 @@
 import Foundation
 import FirebaseFirestore
 
+@MainActor
+
 class BookViewModel: ObservableObject {
     @Published var book = Book()
     

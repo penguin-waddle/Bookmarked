@@ -7,16 +7,26 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import FirebaseFirestoreSwift
 
 struct BookDetailView: View {
     var book: Book
     
+    @FirestoreQuery(collectionPath: "books") var reviews: [Review]
     @State private var isDescriptionExpanded = false
+    @State private var showReviewViewSheet = false
+    var previewRunning = false
+    var avgRating: String {
+        guard reviews.count != 0 else {
+            return "-.-"
+        }
+        let averageValue = Double(reviews.reduce(0) {$0 + $1.rating}) / Double(reviews.count)
+        return String(format: "%.1f", averageValue)
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                
+        List {
+            Section(header: EmptyView()) {
                 HStack(alignment: .top) {
                     // Display the cover image if the imageUrl is available
                     if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
@@ -41,24 +51,19 @@ struct BookDetailView: View {
                                 .font(.callout)
                                 .foregroundColor(.secondary)
                         }
-
                     }
                     .padding(.leading, 16)
                 }
                 .padding()
-
-                Divider()
-                    .padding(.vertical, 16)
 
                 if let description = book.description {
                     Group {
                         if isDescriptionExpanded || description.split(separator: " ").count <= 50 {
                             Text(description)
                         } else {
-                            Text(String(description.prefix(300)) + "...") // Show first 300 characters as an example, adjust as needed
+                            Text(String(description.prefix(300)) + "...") // Show first 300 characters as an example
                         }
                     }
-                    .padding(.horizontal)
                     
                     if description.split(separator: " ").count > 50 {
                         Button(action: {
@@ -69,38 +74,75 @@ struct BookDetailView: View {
                             Text(isDescriptionExpanded ? "Read Less" : "Read More")
                                 .foregroundColor(.blue)
                         }
-                        .padding(.horizontal)
                     }
                 }
-                
+            }
+
+            Section(header:
+                HStack {
+                    Text("Avg. Rating:")
+                        .font(.title2)
+                        .bold()
+                    Text(avgRating)
+                        .font(.title)
+                        .fontWeight(.black)
+                        .foregroundColor(Color("BookColor"))
+                    Spacer()
+                    Button("Rate this book") {
+                        showReviewViewSheet.toggle()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .bold()
+                    .tint(Color("BookColor"))
+                }
+            ) {
+                ForEach(reviews) { review in
+                    NavigationLink {
+                        ReviewView(book: book, review: review)
+                    } label: {
+                        BookReviewRowView(review: review)
+                    }
+                }
             }
         }
+        .listStyle(PlainListStyle())
         .font(.custom("PingFangTC-Regular", size: 16))
+        .onAppear {
+            if !previewRunning { // Prevents preview provider error
+                $reviews.path = "books/\(book.id ?? "")/reviews"
+                print("reviews.path = \($reviews.path)")
+            }
+        }
+        .sheet(isPresented: $showReviewViewSheet) {
+            NavigationStack {
+                ReviewView(book: book, review: Review())
+            }
+        }
     }
     
     func formatDate(_ dateString: String) -> String {
-        // Create a date formatter to parse the date string
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd" // Assuming the original format is this
+           // Create a date formatter to parse the date string
+           let inputFormatter = DateFormatter()
+           inputFormatter.dateFormat = "yyyy-MM-dd" // Assuming the original format is this
 
-        // Check if we can create a Date object from the string
-        if let date = inputFormatter.date(from: dateString) {
-            // Format the date object to the desired format
-            let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "MMMM dd, yyyy"
-            return outputFormatter.string(from: date)
-        } else {
-            // If we cannot create a Date object, return the original string
-            return dateString
-        }
-    }
-
+           // Check if we can create a Date object from the string
+           if let date = inputFormatter.date(from: dateString) {
+               // Format the date object to the desired format
+               let outputFormatter = DateFormatter()
+               outputFormatter.dateFormat = "MMMM dd, yyyy"
+               return outputFormatter.string(from: date)
+           } else {
+               // If we cannot create a Date object, return the original string
+               return dateString
+           }
+       }
 }
 
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        BookDetailView(book: Book(title: "Sample Title", author: "Sample Author", description: "This is a sample description for a sample book. The story revolves around ...", publishedDate: "2023", imageUrl: nil))
+        BookDetailView(book: Book(title: "Sample Title", author: "Sample Author", description: "This is a sample description for a sample book. The story revolves around ...", publishedDate: "2023", imageUrl: nil), previewRunning: true)
     }
 }
+
 
 

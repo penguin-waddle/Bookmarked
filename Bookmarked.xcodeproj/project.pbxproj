@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */; };
+		1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5370692AB90DE5005B3D8D /* BookReviewRowView.swift */; };
 		1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5BCBC32A95505F00C0A1D6 /* FirebaseAuth */; };
 		1E5BCBC62A95505F00C0A1D6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5BCBC52A95505F00C0A1D6 /* FirebaseFirestore */; };
 		1E5BCBC82A95505F00C0A1D6 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5BCBC72A95505F00C0A1D6 /* FirebaseFirestoreSwift */; };
@@ -23,12 +25,17 @@
 		1E95BDA62A9540FE005B4D0D /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E95BDA52A9540FE005B4D0D /* LoginView.swift */; };
 		1E95BDA82A9540FF005B4D0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E95BDA72A9540FF005B4D0D /* Assets.xcassets */; };
 		1E95BDAC2A9540FF005B4D0D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */; };
+		1EAA82592AB5517500297279 /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA82582AB5517500297279 /* Review.swift */; };
+		1EAA825B2AB5554900297279 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA825A2AB5554900297279 /* ReviewView.swift */; };
+		1EAA825D2AB561EF00297279 /* StarsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */; };
 		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
 		1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1E50B8182A9547B9004F6C3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewModel.swift; sourceTree = "<group>"; };
+		1E5370692AB90DE5005B3D8D /* BookReviewRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookReviewRowView.swift; sourceTree = "<group>"; };
 		1E5BCBCB2A9551D700C0A1D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1E5BCBCD2A958C2A00C0A1D6 /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
 		1E65A3FB2A9D392800F23AE4 /* GoogleBooksResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleBooksResponse.swift; sourceTree = "<group>"; };
@@ -43,6 +50,9 @@
 		1E95BDA72A9540FF005B4D0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1E95BDA92A9540FF005B4D0D /* Bookmarked.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Bookmarked.entitlements; sourceTree = "<group>"; };
 		1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1EAA82582AB5517500297279 /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
+		1EAA825A2AB5554900297279 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsSelectionView.swift; sourceTree = "<group>"; };
 		1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,6 +117,7 @@
 			children = (
 				1E8B6F4A2A9683A800EAB91A /* Book.swift */,
 				1E65A3FB2A9D392800F23AE4 /* GoogleBooksResponse.swift */,
+				1EAA82582AB5517500297279 /* Review.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -115,6 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				1E8B6F4E2A9699ED00EAB91A /* BookViewModel.swift */,
+				1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */,
 				1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */,
 				1E65A3FF2A9D7ABC00F23AE4 /* ResultsViewModel.swift */,
 			);
@@ -125,9 +137,12 @@
 			isa = PBXGroup;
 			children = (
 				1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */,
+				1E5370692AB90DE5005B3D8D /* BookReviewRowView.swift */,
 				1E8B6F4C2A9684CA00EAB91A /* BookSearchView.swift */,
 				1E5BCBCD2A958C2A00C0A1D6 /* ListView.swift */,
 				1E95BDA52A9540FE005B4D0D /* LoginView.swift */,
+				1EAA825A2AB5554900297279 /* ReviewView.swift */,
+				1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -167,7 +182,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					1E95BD9F2A9540FE005B4D0D = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -216,10 +231,15 @@
 			files = (
 				1E8B6F4B2A9683A800EAB91A /* Book.swift in Sources */,
 				1E95BDA62A9540FE005B4D0D /* LoginView.swift in Sources */,
+				1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */,
+				1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */,
 				1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */,
+				1EAA825D2AB561EF00297279 /* StarsSelectionView.swift in Sources */,
 				1E65A3FE2A9D6C7500F23AE4 /* Webservice.swift in Sources */,
+				1EAA825B2AB5554900297279 /* ReviewView.swift in Sources */,
 				1E65A4002A9D7ABC00F23AE4 /* ResultsViewModel.swift in Sources */,
 				1E8B6F4D2A9684CA00EAB91A /* BookSearchView.swift in Sources */,
+				1EAA82592AB5517500297279 /* Review.swift in Sources */,
 				1E95BDA42A9540FE005B4D0D /* BookmarkedApp.swift in Sources */,
 				1E5BCBCE2A958C2A00C0A1D6 /* ListView.swift in Sources */,
 				1E65A3FC2A9D392800F23AE4 /* GoogleBooksResponse.swift in Sources */,
@@ -234,6 +254,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -263,9 +284,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -292,6 +315,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -321,9 +345,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -347,6 +373,7 @@
 				CODE_SIGN_ENTITLEMENTS = Bookmarked/Bookmarked.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Bookmarked/Preview Content\"";
 				DEVELOPMENT_TEAM = VCZ9KBCD6H;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -387,6 +414,7 @@
 				CODE_SIGN_ENTITLEMENTS = Bookmarked/Bookmarked.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Bookmarked/Preview Content\"";
 				DEVELOPMENT_TEAM = VCZ9KBCD6H;
 				ENABLE_HARDENED_RUNTIME = YES;
