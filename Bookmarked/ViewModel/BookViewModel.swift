@@ -36,4 +36,31 @@ class BookViewModel: ObservableObject {
             }
         }
     }
+    
+    func bookExists(isbn10: String?, isbn13: String?) async -> Bool {
+        let db = Firestore.firestore()
+        var query: Query!
+        
+        if let isbn10Value = isbn10 {
+            query = db.collection("books").whereField("isbn10", isEqualTo: isbn10Value)
+        } else if let isbn13Value = isbn13 {
+            query = db.collection("books").whereField("isbn13", isEqualTo: isbn13Value)
+        } else {
+            // Neither isbn10 nor isbn13 provided, so return false
+            return false
+        }
+
+        let snapshot = try? await query.getDocuments()
+        return snapshot?.documents.count ?? 0 > 0
+    }
+
+
+    func saveBookIfNotExists(book: Book) async -> Bool {
+        let exists = await bookExists(isbn10: book.isbn10, isbn13: book.isbn13)
+        if !exists {
+            return await saveBook(book: book)
+        }
+        return true
+    }
+
 }

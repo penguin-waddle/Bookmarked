@@ -21,10 +21,12 @@ struct SearchBar: View {
     }
 }
 
+
 struct BookSearchView: View {
     @EnvironmentObject var bookVM: BookViewModel
     @State var book: Book
-    @Environment(\.dismiss) private var dismiss
+    @State private var showBookDetail = false
+    @State private var selectedBook: Book?
     
     @State private var searchText: String = ""
     @StateObject private var resultsListVM = ResultsListViewModel()
@@ -35,43 +37,48 @@ struct BookSearchView: View {
                     SearchBar(text: $searchText)
                         .padding(.horizontal)
                     
-                    List(resultsListVM.books, id: \.id) { resultViewModel in
-                        HStack {
-                            // Check and fetch the thumbnail
-                            if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
-                                AsyncImage(url: url) { image in
-                                    image.resizable()
-                                        .scaledToFit()
-                                } placeholder: {
-                                    ProgressView()
+                        List(resultsListVM.books, id: \.id) { resultViewModel in
+                            NavigationLink(
+                                destination: BookDetailView(book: resultViewModel.book),
+                                label: {
+                                    HStack {
+                                        // Check and fetch the thumbnail
+                                        if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
+                                            AsyncImage(url: url) { image in
+                                                image.resizable()
+                                                    .scaledToFit()
+                                            } placeholder: {
+                                                ProgressView()
+                                            }
+                                            .frame(width: 50, height: 80)
+                                        } else {
+                                            Rectangle()
+                                                .fill(Color.gray)
+                                                .frame(width: 50, height: 80)
+                                        }
+                                        
+                                        VStack(alignment: .leading) {
+                                            Text(resultViewModel.title)
+                                            Text(resultViewModel.authors)
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
                                 }
-                                .frame(width: 50, height: 80)
-                            } else {
-                                Rectangle()
-                                    .fill(Color.gray)
-                                    .frame(width: 50, height: 80)
-                            }
-                            
-                            VStack(alignment: .leading) {
-                                Text(resultViewModel.title)
-                                Text(resultViewModel.authors)
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                            }
+                                )
+                                .onTapGesture {
+                                    selectBook(from: resultViewModel.book)
+                                }
                         }
-                        .onTapGesture {
-                            selectBook(from: resultViewModel.book)
-                        }
-                    }
-                    .listStyle(.plain)
-                    .onChange(of: searchText) { value in
-                        Task {
-                            if !value.isEmpty && value.count > 3 {
-                                await resultsListVM.search(name: value)
-                            } else {
-                                resultsListVM.books.removeAll()
+                        .listStyle(.plain)
+                        .onChange(of: searchText) { value in
+                            Task {
+                                if !value.isEmpty && value.count > 3 {
+                                    await resultsListVM.search(name: value)
+                                } else {
+                                    resultsListVM.books.removeAll()
+                                }
                             }
-                        }
                     }
                 }
                 .navigationTitle("Books")
@@ -83,11 +90,13 @@ struct BookSearchView: View {
         // Since you already have a book instance, you can bypass the conversion.
         // Use BookViewModel to save this book to Firestore
         Task {
-            let success = await bookVM.saveBook(book: book)
+            let success = await bookVM.saveBookIfNotExists(book: book)
             if success {
                 print("Success adding book!")
-                // Dismiss the detail view
-                dismiss()
+                selectedBook = book
+                // Ensure the book is set before showing details.
+                guard selectedBook != nil else { return }
+                showBookDetail = true
             } else {
                 print("Error saving book!")
             }

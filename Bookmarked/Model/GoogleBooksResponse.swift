@@ -19,16 +19,21 @@ struct GoogleBookItem: Codable {
         let title: String
         let authors: [String]
         let publishedDate: String?
+        let publisher: String?
         let description: String?
         let imageLinks: ImageLinks?
+        let industryIdentifiers: [IndustryIdentifier]?
         
         struct ImageLinks: Codable {
             let smallThumbnail: String
             let thumbnail: String
         }
+        
+        struct IndustryIdentifier: Codable {
+            let type: String
+            let identifier: String
+        }
     }
-
-    
 }
 
 

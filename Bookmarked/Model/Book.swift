@@ -14,6 +14,9 @@ struct Book: Identifiable, Codable {
     var author: String
     var description: String?
     var publishedDate: String?
+    var publisher: String?
+    var isbn10: String?
+    var isbn13: String?
     var imageUrl: String?
     
     init(id: String? = nil,
@@ -21,12 +24,18 @@ struct Book: Identifiable, Codable {
          author: String = "Unknown Author",
          description: String? = nil,
          publishedDate: String? = nil,
+         publisher: String? = nil,
+         isbn10: String? = nil,
+         isbn13: String? = nil,
          imageUrl: String? = nil) {
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.publishedDate = publishedDate
+        self.publisher = publisher
+        self.isbn10 = isbn10
+        self.isbn13 = isbn13
         self.imageUrl = imageUrl
     }
 }
@@ -38,6 +47,9 @@ extension Book {
             "author": author,
             "description": description ?? "",
             "publishedDate": publishedDate ?? "",
+            "publisher": publisher ?? "",
+            "isbn10": isbn10 ?? "",
+            "isbn13": isbn13 ?? "",
             "imageUrl": imageUrl ?? ""
         ]
     }
