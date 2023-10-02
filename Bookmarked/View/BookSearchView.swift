@@ -24,8 +24,8 @@ struct SearchBar: View {
 
 struct BookSearchView: View {
     @EnvironmentObject var bookVM: BookViewModel
+    @Environment(\.dismiss) private var dismiss
     @State var book: Book
-    @State private var showBookDetail = false
     @State private var selectedBook: Book?
     
     @State private var searchText: String = ""
@@ -67,7 +67,7 @@ struct BookSearchView: View {
                                 }
                                 )
                                 .onTapGesture {
-                                    selectBook(from: resultViewModel.book)
+                                    selectedBook = resultViewModel.book
                                 }
                         }
                         .listStyle(.plain)
@@ -81,29 +81,13 @@ struct BookSearchView: View {
                             }
                     }
                 }
-                .navigationTitle("Books")
+                .navigationTitle("Search Books")
                 .navigationBarTitleDisplayMode(.inline)
+                .navigationBarItems(trailing: Button("Done") {
+                    dismiss()
+                })
             }
         }
-
-    func selectBook(from book: Book) {
-        // Since you already have a book instance, you can bypass the conversion.
-        // Use BookViewModel to save this book to Firestore
-        Task {
-            let success = await bookVM.saveBookIfNotExists(book: book)
-            if success {
-                print("Success adding book!")
-                selectedBook = book
-                // Ensure the book is set before showing details.
-                guard selectedBook != nil else { return }
-                showBookDetail = true
-            } else {
-                print("Error saving book!")
-            }
-        }
-    }
-
-
 }
 
 struct BookSearchView_Previews: PreviewProvider {

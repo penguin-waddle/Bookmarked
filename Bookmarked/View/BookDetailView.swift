@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 import FirebaseFirestoreSwift
 
 struct BookDetailView: View {
+    @EnvironmentObject var bookVM: BookViewModel
     var book: Book
     
     @FirestoreQuery(collectionPath: "books") var reviews: [Review]
@@ -89,7 +90,7 @@ struct BookDetailView: View {
                         .foregroundColor(Color("BookColor"))
                     Spacer()
                     Button("Rate this book") {
-                        showReviewViewSheet.toggle()
+                        handleBookRating()
                     }
                     .buttonStyle(.borderedProminent)
                     .bold()
@@ -118,7 +119,20 @@ struct BookDetailView: View {
                 ReviewView(book: book, review: Review())
             }
         }
+        .navigationBarItems(trailing: HeartView(bookID: book.id ?? "DefaultID"))
     }
+    
+    func handleBookRating() {
+            Task {
+                let success = await bookVM.saveBookIfNotExists(book: book)
+                if success {
+                    print("Book saved!")
+                    showReviewViewSheet.toggle()
+                } else {
+                    print("Error saving the book!")
+                }
+            }
+        }
     
     func formatDate(_ dateString: String) -> String {
            // Create a date formatter to parse the date string
