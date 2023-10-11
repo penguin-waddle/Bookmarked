@@ -6,24 +6,48 @@
 //
 
 import SwiftUI
+import SDWebImageSwiftUI
 import Firebase
 import FirebaseFirestoreSwift
 
+struct ActivityPostView: View {
+    var item: ActivityFeedItem
+    
+    var body: some View {
+        HStack(alignment: .top) {
+            if let imageUrl = item.book.imageUrl, let url = URL(string: imageUrl) {
+                WebImage(url: url)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60)
+                    .cornerRadius(8)
+            }
+            VStack(alignment: .leading) {
+                Text("\(item.userID) \(item.type == .review ? "added a review" : "favorited")")
+                    .font(.headline)
+                Text(item.book.title)
+                    .font(.subheadline)
+            }
+            Spacer()
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+
 struct ListView: View {
-    @FirestoreQuery(collectionPath: "books") var books: [Book]
+    @FirestoreQuery(collectionPath: "activityFeed") var feedItems: [ActivityFeedItem]
     @State private var sheetIsPresented = false
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         NavigationStack {
-            List(books) { book in
+            List(feedItems) { item in
                 NavigationLink {
-                    BookDetailView(book: book)
+                    BookDetailView(book: item.book)
                 } label: {
-                    Text(book.title)
-                        .font(.title2)
+                    ActivityPostView(item: item)
                 }
-                
             }
             .listStyle(.plain)
             .navigationTitle("Book Reviews")

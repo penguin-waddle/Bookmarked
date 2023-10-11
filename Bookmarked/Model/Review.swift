@@ -17,8 +17,11 @@ struct Review: Identifiable, Codable {
     var rating = 0
     var reviewer = Auth.auth().currentUser?.email ?? ""
     var postedOn = Date()
+    var userID: String?
+    var bookID: String?
     
     var dictionary: [String: Any] {
-        return ["title": title, "body": body, "rating": rating, "reviewer": reviewer, "postedOn": Timestamp(date: Date())]
+        return ["title": title, "body": body, "rating": rating, "reviewer": reviewer, "postedOn": Timestamp(date: Date()),
+                "userID": userID ?? Auth.auth().currentUser?.uid ?? "", "bookID": bookID ?? ""]
     }
 }

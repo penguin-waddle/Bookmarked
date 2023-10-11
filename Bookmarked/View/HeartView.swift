@@ -14,7 +14,7 @@ struct ErrorAlert: Identifiable {
 }
 
 struct HeartView: View {
-    let bookID: String
+    let book: Book
     
     @State private var isFavorite: Bool = false
     @State private var favoriteDocID: String? = nil
@@ -48,7 +48,7 @@ struct HeartView: View {
         isLoading = true
 
         let userId = Auth.auth().currentUser!.uid
-        let documentId = "\(userId)_\(bookID)"
+        let documentId = "\(userId)_\(book.id ?? "")"
 
         let favoriteDocument = Firestore.firestore().collection("favorites").document(documentId)
         
@@ -78,7 +78,7 @@ struct HeartView: View {
 
         // Combine the userID and bookID to create a unique document ID
         let userId = Auth.auth().currentUser!.uid
-        let documentId = "\(userId)_\(bookID)"
+        let documentId = "\(userId)_\(book.id ?? "")"
 
         if isFavorite {
             Firestore.firestore().collection("favorites").document(documentId).delete() { error in
@@ -94,7 +94,10 @@ struct HeartView: View {
         } else {
             let favoriteData: [String: Any] = [
                 "userID": userId,
-                "bookID": bookID
+                "bookID": book.id ?? "",
+                "title": book.title,
+                "author": book.author,
+                "imageUrl": book.imageUrl ?? ""
             ]
             Firestore.firestore().collection("favorites").document(documentId).setData(favoriteData) { error in
                 DispatchQueue.main.async {

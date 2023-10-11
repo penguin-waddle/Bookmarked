@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 class ReviewViewModel: ObservableObject {
     @Published var review = Review()
@@ -19,11 +20,15 @@ class ReviewViewModel: ObservableObject {
             return false
         }
         
+        var updatedReview = review
+        updatedReview.bookID = bookID  // Setting the bookID of the review
+        updatedReview.userID = Auth.auth().currentUser?.uid  // Setting the userID of the review
+        
         let collectionString = "books/\(bookID)/reviews"
         
-        if let id = review.id { // review already exists, so save
+        if let id = updatedReview.id { // review already exists, so save
             do {
-                try await db.collection(collectionString).document(id).setData(review.dictionary)
+                try await db.collection(collectionString).document(id).setData(updatedReview.dictionary)
                 print("Data updated successfully!")
                 return true
             } catch {
@@ -32,7 +37,7 @@ class ReviewViewModel: ObservableObject {
             }
         } else { // no id? new review to add
             do {
-                try await db.collection(collectionString).addDocument(data: review.dictionary)
+                try await db.collection(collectionString).addDocument(data: updatedReview.dictionary)
                 print("Data added successfully!")
                 return true
             } catch {

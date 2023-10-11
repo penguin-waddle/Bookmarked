@@ -119,7 +119,7 @@ struct BookDetailView: View {
                 ReviewView(book: book, review: Review())
             }
         }
-        .navigationBarItems(trailing: HeartView(bookID: book.id ?? "DefaultID"))
+        .navigationBarItems(trailing: HeartView(book: book))
     }
     
     func handleBookRating() {
