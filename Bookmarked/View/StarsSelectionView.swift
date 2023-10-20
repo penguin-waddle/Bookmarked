@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StarsSelectionView: View {
-    @Binding var rating: Int //change to @Binding after layout testing
+    @Binding var rating: Int
     @State var interactive = true
     let highestRating = 5
     let unselected = Image(systemName: "star")

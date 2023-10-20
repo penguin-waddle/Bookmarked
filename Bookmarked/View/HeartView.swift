@@ -14,7 +14,8 @@ struct ErrorAlert: Identifiable {
 }
 
 struct HeartView: View {
-    let book: Book
+    @Binding var book: Book
+    var fromAPI: Bool
     
     @State private var isFavorite: Bool = false
     @State private var favoriteDocID: String? = nil
@@ -38,24 +39,44 @@ struct HeartView: View {
             Spacer()
         }
         .disabled(isLoading)
-        .onAppear(perform: checkIfBookIsFavorite)
+        .onAppear {
+            print("HeartView onAppear called")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                print("Book ID in HeartView: \(book.id ?? "Not Available")")
+                checkIfBookIsFavorite()
+            }
+        }
         .alert(item: $errorAlert) { alert in
                     Alert(title: Text("Error"), message: Text(alert.message), dismissButton: .default(Text("OK")))
         }
     }
-    
+
     func checkIfBookIsFavorite() {
+        print("Checking if book is a favorite...")
         isLoading = true
 
         let userId = Auth.auth().currentUser!.uid
-        let documentId = "\(userId)_\(book.id ?? "")"
+        
+        let bookId: String
+        if fromAPI {
+            bookId = book.id ?? ""
+        } else {
+            if let range = book.id?.range(of: "_") {
+                bookId = String(book.id?[range.upperBound...] ?? "")
+            } else {
+                bookId = ""
+            }
+        }
+        
+        let documentId = "\(userId)_\(bookId)"
+        print("Document ID being checked: \(documentId)")
 
         let favoriteDocument = Firestore.firestore().collection("favorites").document(documentId)
-        
+            
         favoriteDocument.getDocument { (documentSnapshot, error) in
             DispatchQueue.main.async {
                 self.isLoading = false
-                
+                    
                 if let error = error {
                     self.errorAlert = ErrorAlert(message: "Failed to fetch favorite status: \(error.localizedDescription)")
                     return
@@ -72,13 +93,24 @@ struct HeartView: View {
         }
     }
 
-    
     func toggleFavorite() {
         isLoading = true
 
         // Combine the userID and bookID to create a unique document ID
         let userId = Auth.auth().currentUser!.uid
-        let documentId = "\(userId)_\(book.id ?? "")"
+        
+        let bookId: String
+        if fromAPI {
+            bookId = book.id ?? ""
+        } else {
+            if let range = book.id?.range(of: "_") {
+                bookId = String(book.id?[range.upperBound...] ?? "")
+            } else {
+                bookId = ""
+            }
+        }
+        
+        let documentId = "\(userId)_\(bookId)"
 
         if isFavorite {
             Firestore.firestore().collection("favorites").document(documentId).delete() { error in
@@ -93,11 +125,14 @@ struct HeartView: View {
             }
         } else {
             let favoriteData: [String: Any] = [
-                "userID": userId,
-                "bookID": book.id ?? "",
-                "title": book.title,
-                "author": book.author,
-                "imageUrl": book.imageUrl ?? ""
+                        "userID": userId,
+                        "bookID": book.id ?? "",
+                        "title": book.title,
+                        "author": book.author,
+                        "imageUrl": book.imageUrl ?? "",
+                        "description": book.description ?? "",
+                        "publishedDate": book.publishedDate ?? "",
+                        "publisher": book.publisher ?? ""
             ]
             Firestore.firestore().collection("favorites").document(documentId).setData(favoriteData) { error in
                 DispatchQueue.main.async {

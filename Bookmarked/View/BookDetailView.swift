@@ -8,12 +8,19 @@
 import SwiftUI
 import SDWebImageSwiftUI
 import FirebaseFirestoreSwift
+import FirebaseFirestore
+import FirebaseAuth
 
 struct BookDetailView: View {
     @EnvironmentObject var bookVM: BookViewModel
-    var book: Book
+    @State private var book: Book = Book()
+    @ObservedObject var resultsVM: ResultsListViewModel
+
+    var bookID: String
+    var activityType: ActivityType
+    var fromAPI: Bool = false
     
-    @FirestoreQuery(collectionPath: "books") var reviews: [Review]
+    @FirestoreQuery(collectionPath: "invalid_path") var reviews: [Review]
     @State private var isDescriptionExpanded = false
     @State private var showReviewViewSheet = false
     var previewRunning = false
@@ -109,17 +116,57 @@ struct BookDetailView: View {
         .listStyle(PlainListStyle())
         .font(.custom("PingFangTC-Regular", size: 16))
         .onAppear {
-            if !previewRunning { // Prevents preview provider error
-                $reviews.path = "books/\(book.id ?? "")/reviews"
-                print("reviews.path = \($reviews.path)")
+            guard !bookID.isEmpty else {
+                print("Error: Invalid Book ID")
+                print("Book ID in BookDetailView: \(book.id ?? "Not Available")")
+                return // Exit if the book ID isn't valid
             }
-        }
+
+            $reviews.path = "books/\(bookID)/reviews"
+
+            if fromAPI {
+                // Fetch data from Google Books API
+                if let resultViewModel = resultsVM.books.first(where: { $0.id == bookID }) {
+                    self.book = resultViewModel.book
+                }
+            } else {
+                book = bookVM.book
+                var docRef: DocumentReference!
+                
+                switch activityType {
+                case .review:
+                    // Fetch from the books collection using the bookID
+                    docRef = Firestore.firestore().collection("books").document(bookID)
+                case .favorite:
+                    // Fetch from the favorites collection using a combined ID of userID and bookID.
+                    let userId = Auth.auth().currentUser!.uid
+                    let documentId = "\(userId)_\(bookID)"
+                    docRef = Firestore.firestore().collection("favorites").document(documentId)
+                }
+                
+                docRef.getDocument { (document, error) in
+                                      if let document = document {
+                                          if document.exists {
+                                              if let fetchedBook = try? document.data(as: Book.self) {
+                                                  self.book = fetchedBook
+                                              } else {
+                                                  print("Failed to decode book from document data.")
+                                              }
+                                          } else {
+                                              print("Document does not exist at path: \(docRef.path)")
+                                          }
+                                      } else {
+                                          print("Book not found or error fetching book: \(error?.localizedDescription ?? "No error")")
+                                      }
+                                  }
+                           }
+                       }
         .sheet(isPresented: $showReviewViewSheet) {
             NavigationStack {
                 ReviewView(book: book, review: Review())
             }
         }
-        .navigationBarItems(trailing: HeartView(book: book))
+        .navigationBarItems(trailing: HeartView(book: $book, fromAPI: fromAPI))
     }
     
     func handleBookRating() {
@@ -154,9 +201,10 @@ struct BookDetailView: View {
 
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        BookDetailView(book: Book(title: "Sample Title", author: "Sample Author", description: "This is a sample description for a sample book. The story revolves around ...", publishedDate: "2023", imageUrl: nil), previewRunning: true)
+        BookDetailView(resultsVM: ResultsListViewModel(), bookID: "SampleBookID", activityType: .review, fromAPI: false, previewRunning: true)
     }
 }
+
 
 
 

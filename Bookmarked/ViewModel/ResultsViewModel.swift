@@ -11,16 +11,30 @@ import Foundation
 class ResultsListViewModel: ObservableObject {
     
     @Published var books: [ResultsViewModel] = []
+    @Published var fetchedBook: ResultsViewModel?
     
     func search(name: String) async {
         do {
-            let countryCode = NSLocale.current.language.region?.identifier ?? "US"
+            let countryCode = NSLocale.current.region?.identifier ?? "US"
             let books = try await Webservice().getBooks(searchTerm: name, country: countryCode)
             self.books = books.map(ResultsViewModel.init)
         } catch {
-            print(error)
+            print(error.localizedDescription)
         }
     }
+    
+    func fetchBookFromAPI(bookID: String) async {
+        do {
+            let countryCode = NSLocale.current.region?.identifier ?? "US"
+            if let googleBookItem = try await Webservice().getBookByID(bookID: bookID, country: countryCode) {
+                let fetchedBook = ResultsViewModel(googleBookItem: googleBookItem)
+                self.fetchedBook = fetchedBook
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+
 }
 
 struct ResultsViewModel: Identifiable {

@@ -21,73 +21,93 @@ struct SearchBar: View {
     }
 }
 
-
 struct BookSearchView: View {
     @EnvironmentObject var bookVM: BookViewModel
     @Environment(\.dismiss) private var dismiss
     @State var book: Book
-    @State private var selectedBook: Book?
     
     @State private var searchText: String = ""
     @StateObject private var resultsListVM = ResultsListViewModel()
     
     var body: some View {
-            NavigationView {
-                VStack {
-                    SearchBar(text: $searchText)
-                        .padding(.horizontal)
-                    
-                        List(resultsListVM.books, id: \.id) { resultViewModel in
-                            NavigationLink(
-                                destination: BookDetailView(book: resultViewModel.book),
-                                label: {
-                                    HStack {
-                                        // Check and fetch the thumbnail
-                                        if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
-                                            AsyncImage(url: url) { image in
-                                                image.resizable()
-                                                    .scaledToFit()
-                                            } placeholder: {
-                                                ProgressView()
-                                            }
-                                            .frame(width: 50, height: 80)
-                                        } else {
-                                            Rectangle()
-                                                .fill(Color.gray)
-                                                .frame(width: 50, height: 80)
-                                        }
-                                        
-                                        VStack(alignment: .leading) {
-                                            Text(resultViewModel.title)
-                                            Text(resultViewModel.authors)
-                                                .font(.subheadline)
-                                                .foregroundColor(.gray)
-                                        }
-                                    }
+        NavigationView {
+            VStack {
+                // Search Bar
+                SearchBar(text: $searchText)
+                    .padding(.horizontal)
+                
+                // Book List
+                List(resultsListVM.books, id: \.id) { resultViewModel in
+                    NavigationLink {
+                        BookDetailView(resultsVM: resultsListVM,
+                                       bookID: resultViewModel.book.id ?? "",
+                                       activityType: .review,
+                                       fromAPI: true)
+                    }
+                label: {
+                    BookRow(resultViewModel: resultViewModel)
+                    }
+                .onTapGesture {
+                    print("Navigating to details for book: \(String(describing: resultViewModel.book.id))")
                                 }
-                                )
-                                .onTapGesture {
-                                    selectedBook = resultViewModel.book
-                                }
+                }
+                .listStyle(.plain)
+                .onChange(of: searchText) { value in
+                    Task {
+                        if !value.isEmpty && value.count > 3 {
+                            await resultsListVM.search(name: value)
+                        } else {
+                            resultsListVM.books.removeAll()
                         }
-                        .listStyle(.plain)
-                        .onChange(of: searchText) { value in
-                            Task {
-                                if !value.isEmpty && value.count > 3 {
-                                    await resultsListVM.search(name: value)
-                                } else {
-                                    resultsListVM.books.removeAll()
-                                }
-                            }
                     }
                 }
-                .navigationTitle("Search Books")
-                .navigationBarTitleDisplayMode(.inline)
-                .navigationBarItems(trailing: Button("Done") {
-                    dismiss()
-                })
+            }
+            .navigationTitle("Search Books")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(trailing: Button("Done") {
+                dismiss()
+            })
+        }
+    }
+}
+
+private struct BookRow: View {
+    let resultViewModel: ResultsViewModel
+    
+    var body: some View {
+        HStack {
+            // Thumbnail
+            if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image.resizable()
+                            .scaledToFit()
+                    case .empty, .failure:
+                        Rectangle()
+                            .fill(Color.gray)
+                            .frame(width: 50, height: 80)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+                .frame(width: 50, height: 80)
+            }
+            else {
+                Rectangle()
+                    .fill(Color.gray)
+                    .frame(width: 50, height: 80)
+            }
+            
+            // Book Info
+            VStack(alignment: .leading) {
+                Text(resultViewModel.title)
+                Text(resultViewModel.authors)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
             }
         }
+    }
 }
 
 struct BookSearchView_Previews: PreviewProvider {

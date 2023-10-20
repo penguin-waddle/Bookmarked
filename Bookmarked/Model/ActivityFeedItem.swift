@@ -15,7 +15,7 @@ enum ActivityType: String, Codable {
 struct ActivityFeedItem: Identifiable, Codable {
     @DocumentID var id: String?
     var userID: String
-    var userEmail: 
-    var book: Book
+    var bookID: String
+    var book: Book?
     var type: ActivityType
 }

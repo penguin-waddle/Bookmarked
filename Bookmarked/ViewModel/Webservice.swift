@@ -56,4 +56,33 @@ class Webservice {
             throw NetworkError.decodingError(decodingError)
         }
     }
+    
+    func getBookByID(bookID: String, country: String) async throws -> GoogleBookItem? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "www.googleapis.com"
+        components.path = "/books/v1/volumes/\(bookID)"
+        components.queryItems = [
+            URLQueryItem(name: "key", value: "AIzaSyCGVqKsuNzdzBXQE5BcKfX_xkinEKFkRYg"),
+            URLQueryItem(name: "country", value: country)
+        ]
+
+        guard let url = components.url else {
+            throw NetworkError.badURL
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw NetworkError.unexpectedStatusCode((response as? HTTPURLResponse)?.statusCode ?? 0)
+        }
+        
+        do {
+            let googleBooksResponse = try JSONDecoder().decode(GoogleBooksResponse.self, from: data)
+            return googleBooksResponse.items.first
+        } catch let decodingError {
+            throw NetworkError.decodingError(decodingError)
+        }
+    }
+
 }

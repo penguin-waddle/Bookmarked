@@ -15,7 +15,7 @@ struct ActivityPostView: View {
     
     var body: some View {
         HStack(alignment: .top) {
-            if let imageUrl = item.book.imageUrl, let url = URL(string: imageUrl) {
+            if let imageUrl = item.book?.imageUrl, let url = URL(string: imageUrl) {
                 WebImage(url: url)
                     .resizable()
                     .scaledToFit()
@@ -25,8 +25,9 @@ struct ActivityPostView: View {
             VStack(alignment: .leading) {
                 Text("\(item.userID) \(item.type == .review ? "added a review" : "favorited")")
                     .font(.headline)
-                Text(item.book.title)
+                Text(item.book?.title ?? "Default Title")
                     .font(.subheadline)
+                Text(item.book?.author ?? "Default Author")
             }
             Spacer()
         }
@@ -42,11 +43,13 @@ struct ListView: View {
     
     var body: some View {
         NavigationStack {
-            List(feedItems) { item in
-                NavigationLink {
-                    BookDetailView(book: item.book)
-                } label: {
-                    ActivityPostView(item: item)
+            List {
+                ForEach(feedItems, id: \.id) { item in
+                    NavigationLink(destination: Group {
+                        BookDetailView(resultsVM: ResultsListViewModel(), bookID: item.bookID, activityType: item.type, fromAPI: false)
+                    }) {
+                        ActivityPostView(item: item)
+                    }
                 }
             }
             .listStyle(.plain)
@@ -77,10 +80,10 @@ struct ListView: View {
             .sheet(isPresented: $sheetIsPresented) {
                 BookSearchView(book: Book())
             }
+            }
+            
         }
     }
-}
-
 struct ListView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
