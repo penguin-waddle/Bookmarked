@@ -30,9 +30,21 @@
 		1EAA82592AB5517500297279 /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA82582AB5517500297279 /* Review.swift */; };
 		1EAA825B2AB5554900297279 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA825A2AB5554900297279 /* ReviewView.swift */; };
 		1EAA825D2AB561EF00297279 /* StarsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */; };
+		1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */; };
+		1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC498112AE71D2A0056F30E /* BookSearchTests.swift */; };
 		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
 		1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1EC4980C2AE71CD70056F30E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1E95BD982A9540FE005B4D0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E95BD9F2A9540FE005B4D0D;
+			remoteInfo = Bookmarked;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1E50B8182A9547B9004F6C3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -57,6 +69,9 @@
 		1EAA82582AB5517500297279 /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
 		1EAA825A2AB5554900297279 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsSelectionView.swift; sourceTree = "<group>"; };
+		1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookmarkedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedTests.swift; sourceTree = "<group>"; };
+		1EC498112AE71D2A0056F30E /* BookSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchTests.swift; sourceTree = "<group>"; };
 		1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,6 +88,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1EC498052AE71CD70056F30E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -80,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				1E95BDA22A9540FE005B4D0D /* Bookmarked */,
+				1EC498092AE71CD70056F30E /* BookmarkedTests */,
 				1E95BDA12A9540FE005B4D0D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				1E95BDA02A9540FE005B4D0D /* Bookmarked.app */,
+				1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,6 +138,15 @@
 				1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1EC498092AE71CD70056F30E /* BookmarkedTests */ = {
+			isa = PBXGroup;
+			children = (
+				1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */,
+				1EC498112AE71D2A0056F30E /* BookSearchTests.swift */,
+			);
+			path = BookmarkedTests;
 			sourceTree = "<group>";
 		};
 		1EDFAFCB2A99328B004F3AE3 /* Model */ = {
@@ -180,6 +213,24 @@
 			productReference = 1E95BDA02A9540FE005B4D0D /* Bookmarked.app */;
 			productType = "com.apple.product-type.application";
 		};
+		1EC498072AE71CD70056F30E /* BookmarkedTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1EC498102AE71CD70056F30E /* Build configuration list for PBXNativeTarget "BookmarkedTests" */;
+			buildPhases = (
+				1EC498042AE71CD70056F30E /* Sources */,
+				1EC498052AE71CD70056F30E /* Frameworks */,
+				1EC498062AE71CD70056F30E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1EC4980D2AE71CD70056F30E /* PBXTargetDependency */,
+			);
+			name = BookmarkedTests;
+			productName = BookmarkedTests;
+			productReference = 1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -187,11 +238,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					1E95BD9F2A9540FE005B4D0D = {
 						CreatedOnToolsVersion = 14.3.1;
+					};
+					1EC498072AE71CD70056F30E = {
+						CreatedOnToolsVersion = 15.0.1;
+						TestTargetID = 1E95BD9F2A9540FE005B4D0D;
 					};
 				};
 			};
@@ -213,6 +268,7 @@
 			projectRoot = "";
 			targets = (
 				1E95BD9F2A9540FE005B4D0D /* Bookmarked */,
+				1EC498072AE71CD70056F30E /* BookmarkedTests */,
 			);
 		};
 /* End PBXProject section */
@@ -225,6 +281,13 @@
 				1E95BDAC2A9540FF005B4D0D /* Preview Assets.xcassets in Resources */,
 				1E95BDA82A9540FF005B4D0D /* Assets.xcassets in Resources */,
 				1E5BCBCC2A9551D800C0A1D6 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1EC498062AE71CD70056F30E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,7 +318,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1EC498042AE71CD70056F30E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */,
+				1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1EC4980D2AE71CD70056F30E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1E95BD9F2A9540FE005B4D0D /* Bookmarked */;
+			targetProxy = 1EC4980C2AE71CD70056F30E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1E95BDAD2A9540FF005B4D0D /* Debug */ = {
@@ -404,6 +484,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
 				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.Bookmarked";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -445,6 +526,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
 				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.Bookmarked";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -452,6 +534,54 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1EC4980E2AE71CD70056F30E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VCZ9KBCD6H;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
+				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.BookmarkedTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bookmarked.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bookmarked";
+			};
+			name = Debug;
+		};
+		1EC4980F2AE71CD70056F30E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VCZ9KBCD6H;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
+				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.BookmarkedTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bookmarked.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bookmarked";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -472,6 +602,15 @@
 			buildConfigurations = (
 				1E95BDB02A9540FF005B4D0D /* Debug */,
 				1E95BDB12A9540FF005B4D0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1EC498102AE71CD70056F30E /* Build configuration list for PBXNativeTarget "BookmarkedTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1EC4980E2AE71CD70056F30E /* Debug */,
+				1EC4980F2AE71CD70056F30E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -10,13 +10,19 @@ import Foundation
 @MainActor
 class ResultsListViewModel: ObservableObject {
     
+    private var webService: WebServiceProvider
+      
+      init(webService: WebServiceProvider = Webservice()) {
+          self.webService = webService
+      }
+    
     @Published var books: [ResultsViewModel] = []
     @Published var fetchedBook: ResultsViewModel?
     
     func search(name: String) async {
         do {
             let countryCode = NSLocale.current.region?.identifier ?? "US"
-            let books = try await Webservice().getBooks(searchTerm: name, country: countryCode)
+            let books = try await webService.getBooks(searchTerm: name, country: countryCode)
             self.books = books.map(ResultsViewModel.init)
         } catch {
             print(error.localizedDescription)
@@ -26,7 +32,7 @@ class ResultsListViewModel: ObservableObject {
     func fetchBookFromAPI(bookID: String) async {
         do {
             let countryCode = NSLocale.current.region?.identifier ?? "US"
-            if let googleBookItem = try await Webservice().getBookByID(bookID: bookID, country: countryCode) {
+            if let googleBookItem = try await webService.getBookByID(bookID: bookID, country: countryCode) {
                 let fetchedBook = ResultsViewModel(googleBookItem: googleBookItem)
                 self.fetchedBook = fetchedBook
             }

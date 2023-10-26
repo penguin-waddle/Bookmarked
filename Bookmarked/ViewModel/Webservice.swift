@@ -7,6 +7,11 @@
 
 import Foundation
 
+protocol WebServiceProvider {
+    func getBooks(searchTerm: String, country: String) async throws -> [GoogleBookItem]
+    func getBookByID(bookID: String, country: String) async throws -> GoogleBookItem?
+}
+
 enum NetworkError: Error {
     case badURL
     case unexpectedStatusCode(Int)
@@ -19,7 +24,7 @@ extension String {
     }
 }
 
-class Webservice {
+class Webservice: WebServiceProvider {
     
     func getBooks(searchTerm: String, country: String) async throws -> [GoogleBookItem] {
         
