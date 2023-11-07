@@ -34,6 +34,10 @@
 		1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC498112AE71D2A0056F30E /* BookSearchTests.swift */; };
 		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
 		1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */; };
+		1EE28AC62AF2DE4600272D21 /* ReviewViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC52AF2DE4600272D21 /* ReviewViewModelTests.swift */; };
+		1EE28AC82AF2E01500272D21 /* FavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC72AF2E01500272D21 /* FavoriteTests.swift */; };
+		1EE28ACA2AF30B9000272D21 /* FirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC12AF2DDDD00272D21 /* FirestoreService.swift */; };
+		1EE28ACB2AF30B9800272D21 /* MockFirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC32AF2DE1400272D21 /* MockFirestoreService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +77,10 @@
 		1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedTests.swift; sourceTree = "<group>"; };
 		1EC498112AE71D2A0056F30E /* BookSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchTests.swift; sourceTree = "<group>"; };
 		1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
+		1EE28AC12AF2DDDD00272D21 /* FirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreService.swift; sourceTree = "<group>"; };
+		1EE28AC32AF2DE1400272D21 /* MockFirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFirestoreService.swift; sourceTree = "<group>"; };
+		1EE28AC52AF2DE4600272D21 /* ReviewViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewModelTests.swift; sourceTree = "<group>"; };
+		1EE28AC72AF2E01500272D21 /* FavoriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +132,7 @@
 				1EDFAFCB2A99328B004F3AE3 /* Model */,
 				1EDFAFCC2A99329B004F3AE3 /* ViewModel */,
 				1EDFAFCD2A9932A9004F3AE3 /* View */,
+				1EE28AC92AF30A5A00272D21 /* Services */,
 				1E95BDA72A9540FF005B4D0D /* Assets.xcassets */,
 				1E5BCBCB2A9551D700C0A1D6 /* GoogleService-Info.plist */,
 				1E95BDA92A9540FF005B4D0D /* Bookmarked.entitlements */,
@@ -145,6 +154,8 @@
 			children = (
 				1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */,
 				1EC498112AE71D2A0056F30E /* BookSearchTests.swift */,
+				1EE28AC52AF2DE4600272D21 /* ReviewViewModelTests.swift */,
+				1EE28AC72AF2E01500272D21 /* FavoriteTests.swift */,
 			);
 			path = BookmarkedTests;
 			sourceTree = "<group>";
@@ -165,7 +176,6 @@
 			children = (
 				1E8B6F4E2A9699ED00EAB91A /* BookViewModel.swift */,
 				1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */,
-				1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */,
 				1E65A3FF2A9D7ABC00F23AE4 /* ResultsViewModel.swift */,
 			);
 			path = ViewModel;
@@ -184,6 +194,16 @@
 				1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		1EE28AC92AF30A5A00272D21 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1EE28AC12AF2DDDD00272D21 /* FirestoreService.swift */,
+				1EE28AC32AF2DE1400272D21 /* MockFirestoreService.swift */,
+				1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -299,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E8B6F4B2A9683A800EAB91A /* Book.swift in Sources */,
+				1EE28ACA2AF30B9000272D21 /* FirestoreService.swift in Sources */,
 				1E95BDA62A9540FE005B4D0D /* LoginView.swift in Sources */,
 				1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */,
 				1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */,
@@ -306,6 +327,7 @@
 				1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */,
 				1EAA825D2AB561EF00297279 /* StarsSelectionView.swift in Sources */,
 				1E65A3FE2A9D6C7500F23AE4 /* Webservice.swift in Sources */,
+				1EE28ACB2AF30B9800272D21 /* MockFirestoreService.swift in Sources */,
 				1EAA825B2AB5554900297279 /* ReviewView.swift in Sources */,
 				1E65A4002A9D7ABC00F23AE4 /* ResultsViewModel.swift in Sources */,
 				1E967DAC2AC754C400D63D1B /* HeartView.swift in Sources */,
@@ -323,6 +345,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */,
+				1EE28AC62AF2DE4600272D21 /* ReviewViewModelTests.swift in Sources */,
+				1EE28AC82AF2E01500272D21 /* FavoriteTests.swift in Sources */,
 				1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

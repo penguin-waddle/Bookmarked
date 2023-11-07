@@ -13,6 +13,7 @@ import FirebaseAuth
 
 struct BookDetailView: View {
     @EnvironmentObject var bookVM: BookViewModel
+    @EnvironmentObject var firestoreService: FirestoreService
     @State private var book: Book = Book()
     @ObservedObject var resultsVM: ResultsListViewModel
 
@@ -166,7 +167,7 @@ struct BookDetailView: View {
                 ReviewView(book: book, review: Review())
             }
         }
-        .navigationBarItems(trailing: HeartView(book: $book, fromAPI: fromAPI))
+        .navigationBarItems(trailing: HeartView(book: $book, fromAPI: fromAPI, firestoreService: firestoreService))
     }
     
     func handleBookRating() {
@@ -201,9 +202,13 @@ struct BookDetailView: View {
 
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        BookDetailView(resultsVM: ResultsListViewModel(), bookID: "SampleBookID", activityType: .review, fromAPI: false, previewRunning: true)
+        let firestoreService = FirestoreService()
+        
+        return BookDetailView(resultsVM: ResultsListViewModel(), bookID: "SampleBookID", activityType: .review, fromAPI: false, previewRunning: true)
+            .environmentObject(firestoreService)
     }
 }
+
 
 
 

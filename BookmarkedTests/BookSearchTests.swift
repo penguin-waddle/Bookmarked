@@ -20,26 +20,24 @@ class BookSearchTests: XCTestCase {
     }
 
     // 1. Test that searching for a valid term returns expected results
+    @MainActor
     func testValidSearch() async {
         mockWebServiceProvider.mockBooks = [MockData.sampleBook1, MockData.sampleBook2]
         
         await resultsListVM.search(name: "Harry Potter")
-        
-        DispatchQueue.main.sync {
-            XCTAssertEqual(resultsListVM.books.count, 2)
-            XCTAssertEqual(resultsListVM.books.first?.title, "Harry Potter and the Sorcerer's Stone")
-        }
+
+        XCTAssertEqual(resultsListVM.books.count, 2)
+        XCTAssertEqual(resultsListVM.books.first?.title, "Harry Potter and the Sorcerer's Stone")
     }
     
     // 2. Test that searching for an invalid term returns no results
+    @MainActor
     func testInvalidSearch() async {
         mockWebServiceProvider.mockBooks = []
         
         await resultsListVM.search(name: "SomeRandomNonExistentBook")
         
-        DispatchQueue.main.sync {
-            XCTAssertEqual(resultsListVM.books.count, 0)
-        }
+        XCTAssertEqual(resultsListVM.books.count, 0)
     }
     
     // 3. Test transformation from GoogleBookItem to ResultsViewModel
@@ -84,9 +82,9 @@ extension BookSearchTests {
             volumeInfo: GoogleBookItem.VolumeInfo(
                 title: "Harry Potter and the Sorcerer's Stone",
                 authors: ["J.K. Rowling"],
-                publishedDate: "2000-01-01",
-                publisher: "Bloomsbury",
-                description: "A book about a young wizard.",
+                publishedDate: "2002-10-08",
+                publisher: "Pillsbury",
+                description: nil,
                 imageLinks: GoogleBookItem.VolumeInfo.ImageLinks(smallThumbnail: "https://example.com/sampleimage.jpg", thumbnail: "https://example.com/sampleimage.jpg"),
                 industryIdentifiers:[GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_10", identifier: "1234567890"),
                                      GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_13", identifier: "1234567890123")]

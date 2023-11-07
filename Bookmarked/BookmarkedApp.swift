@@ -22,10 +22,15 @@ struct BookmarkedApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var bookVM = BookViewModel()
     
+    var firestoreService: FirestoreService {
+           return FirestoreService()
+       }
+    
     var body: some Scene {
         WindowGroup {
             LoginView()
                 .environmentObject(bookVM)
+                .environmentObject(firestoreService)
         }
     }
 }
