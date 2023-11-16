@@ -17,8 +17,9 @@
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+const functions = require('firebase-functions');
+const axios = require('axios');
+const admin = require('firebase-admin');
 admin.initializeApp();
 
 exports.addFavoriteToActivityFeed = functions.firestore
@@ -163,3 +164,58 @@ exports.updateActivityFeedOnBookChange = functions.firestore
     return null;
   }
 });
+
+exports.getBooks = functions.https.onCall(async (data, context) => {
+  const searchTerm = data.searchTerm;
+  const apiKey = functions.config().googlebooks.key; 
+
+  try {
+      const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchTerm)}&key=${apiKey}`);
+      // Wrap the books array in an object under the 'items' key
+      return { items: response.data.items }; 
+  } catch (error) {
+      console.error("Error fetching books:", error);
+      throw new functions.https.HttpsError('unknown', 'Failed to fetch books');
+  }
+});
+
+
+exports.getBookByID = functions.https.onCall(async (data, context) => {
+  const bookID = data.bookID;
+  const apiKey = functions.config().googlebooks.key;
+
+  try {
+      const response = await axios.get(`https://www.googleapis.com/books/v1/volumes/${bookID}?key=${apiKey}`);
+      
+      // Extract the necessary data to match GoogleBookItem structure
+      const bookData = response.data;
+      const transformedData = {
+          id: bookData.id,
+          volumeInfo: {
+              title: bookData.volumeInfo.title,
+              authors: bookData.volumeInfo.authors,
+              publishedDate: bookData.volumeInfo.publishedDate,
+              publisher: bookData.volumeInfo.publisher,
+              description: bookData.volumeInfo.description,
+              imageLinks: {
+                  smallThumbnail: bookData.volumeInfo.imageLinks?.smallThumbnail,
+                  thumbnail: bookData.volumeInfo.imageLinks?.thumbnail
+              },
+              industryIdentifiers: bookData.volumeInfo.industryIdentifiers
+                  ? bookData.volumeInfo.industryIdentifiers.map(identifier => {
+                      return {
+                          type: identifier.type,
+                          identifier: identifier.identifier
+                      };
+                  })
+                  : []
+          }
+      };
+
+      return transformedData;
+  } catch (error) {
+      console.error("Error fetching book by ID:", error);
+      throw new functions.https.HttpsError('unknown', 'Failed to fetch book by ID');
+  }
+});
+

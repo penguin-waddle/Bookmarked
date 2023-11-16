@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E023C452B06B1F8003A7B4E /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 1E023C442B06B1F8003A7B4E /* FirebaseFunctions */; };
 		1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */; };
 		1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5370692AB90DE5005B3D8D /* BookReviewRowView.swift */; };
 		1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5BCBC32A95505F00C0A1D6 /* FirebaseAuth */; };
@@ -91,6 +92,7 @@
 				1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */,
 				1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */,
 				1E5BCBCA2A95505F00C0A1D6 /* FirebaseStorage in Frameworks */,
+				1E023C452B06B1F8003A7B4E /* FirebaseFunctions in Frameworks */,
 				1E5BCBC62A95505F00C0A1D6 /* FirebaseFirestore in Frameworks */,
 				1E5BCBC82A95505F00C0A1D6 /* FirebaseFirestoreSwift in Frameworks */,
 			);
@@ -228,6 +230,7 @@
 				1E5BCBC72A95505F00C0A1D6 /* FirebaseFirestoreSwift */,
 				1E5BCBC92A95505F00C0A1D6 /* FirebaseStorage */,
 				1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */,
+				1E023C442B06B1F8003A7B4E /* FirebaseFunctions */,
 			);
 			productName = Bookmarked;
 			productReference = 1E95BDA02A9540FE005B4D0D /* Bookmarked.app */;
@@ -661,6 +664,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1E023C442B06B1F8003A7B4E /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
 		1E5BCBC32A95505F00C0A1D6 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

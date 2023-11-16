@@ -48,7 +48,7 @@ struct HeartView: View {
         .disabled(isLoading)
         .onAppear {
             print("HeartView onAppear called")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                 print("Book ID in HeartView: \(book.id ?? "Not Available")")
                 checkIfBookIsFavorite()
             }

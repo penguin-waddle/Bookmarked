@@ -161,7 +161,7 @@ struct BookDetailView: View {
                                       }
                                   }
                            }
-                       }
+        }
         .sheet(isPresented: $showReviewViewSheet) {
             NavigationStack {
                 ReviewView(book: book, review: Review())
