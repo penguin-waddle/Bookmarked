@@ -92,11 +92,13 @@ private struct BookRow: View {
                     }
                 }
                 .frame(width: 50, height: 80)
+                .cornerRadius(8)
             }
             else {
                 Rectangle()
                     .fill(Color.gray)
                     .frame(width: 50, height: 80)
+                    .cornerRadius(8)
             }
             
             // Book Info
@@ -105,6 +107,9 @@ private struct BookRow: View {
                 Text(resultViewModel.authors)
                     .font(.subheadline)
                     .foregroundColor(.gray)
+                Text(resultViewModel.publisher)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
             }
         }
     }

@@ -74,6 +74,10 @@ struct ResultsViewModel: Identifiable {
     var authors: String {
         return book.author
     }
+    
+    var publisher: String {
+        return book.publisher ?? "Unknown Publisher"
+    }
 
     var image: String? {
         return book.imageUrl

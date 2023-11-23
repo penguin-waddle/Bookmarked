@@ -37,6 +37,7 @@ struct BookDetailView: View {
         List {
             Section(header: EmptyView()) {
                 HStack(alignment: .top) {
+                    Text("") // Empty text for divider to span whole view
                     // Display the cover image if the imageUrl is available
                     if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
                         WebImage(url: url)
@@ -63,6 +64,7 @@ struct BookDetailView: View {
                     }
                     .padding(.leading, 16)
                 }
+                .listRowInsets(EdgeInsets())
                 .padding()
 
                 if let description = book.description {

@@ -27,9 +27,13 @@ exports.addFavoriteToActivityFeed = functions.firestore
     .onCreate(async (snap, context) => {
       try {
         const favorite = snap.data();
+        const userRecord = await admin.auth().getUser(favorite.userID);
+        const userEmail = userRecord.email;
+        const displayEmail = userEmail.substring(0, 6); // Extract first 6 characters of the email
 
         // Create the activity feed item with book details
         return await admin.firestore().collection("activityFeed").add({
+          displayEmail: displayEmail, // Use displayEmail instead of userEmail
           userID: favorite.userID,
           bookID: favorite.bookID,
           book: {
@@ -54,6 +58,9 @@ exports.addReviewToActivityFeed = functions.firestore
 .onCreate(async (snap, context) => {
   try {
     const review = snap.data();
+    const userRecord = await admin.auth().getUser(review.userID);
+    const userEmail = userRecord.email;
+    const displayEmail = userEmail.substring(0, 6);
 
     // Fetch the book details
     const bookSnap = await admin.firestore().collection("books").doc(review.bookID).get();
@@ -65,6 +72,7 @@ exports.addReviewToActivityFeed = functions.firestore
 
     // Create the activity feed item with book details
     return await admin.firestore().collection("activityFeed").add({
+      displayEmail: displayEmail,
       userID: review.userID,
       bookID: review.bookID,  // Keeping bookID at root level for easy deletion
       book: {
