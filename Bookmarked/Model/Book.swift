@@ -18,6 +18,8 @@ struct Book: Identifiable, Codable {
     var isbn10: String?
     var isbn13: String?
     var imageUrl: String?
+    var pageCount: Int?
+    var categories: [String]?
     
     init(id: String? = nil,
          title: String = "",
@@ -27,7 +29,9 @@ struct Book: Identifiable, Codable {
          publisher: String? = nil,
          isbn10: String? = nil,
          isbn13: String? = nil,
-         imageUrl: String? = nil) {
+         imageUrl: String? = nil,
+         pageCount: Int? = nil,
+         categories: [String]? = nil) {
         self.id = id
         self.title = title
         self.author = author
@@ -37,6 +41,8 @@ struct Book: Identifiable, Codable {
         self.isbn10 = isbn10
         self.isbn13 = isbn13
         self.imageUrl = imageUrl
+        self.pageCount = pageCount
+        self.categories = categories
     }
 }
 
@@ -50,7 +56,9 @@ extension Book {
             "publisher": publisher ?? "",
             "isbn10": isbn10 ?? "",
             "isbn13": isbn13 ?? "",
-            "imageUrl": imageUrl ?? ""
+            "imageUrl": imageUrl ?? "",
+            "pageCount": pageCount ?? "",
+            "categories": categories ?? []
         ]
     }
 }

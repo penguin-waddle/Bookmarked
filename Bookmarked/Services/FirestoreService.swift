@@ -162,7 +162,9 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
                  "imageUrl": book.imageUrl ?? "",
                  "description": book.description ?? "",
                  "publishedDate": book.publishedDate ?? "",
-                 "publisher": book.publisher ?? ""
+                 "publisher": book.publisher ?? "",
+                 "pageCount": book.pageCount ?? "",
+                 "categories": book.categories ?? ""
              ]
              favoriteDocument.setData(favoriteData) { error in
                  completion(error == nil, error)

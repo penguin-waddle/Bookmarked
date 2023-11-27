@@ -63,7 +63,9 @@ struct ResultsViewModel: Identifiable {
             publisher: googleBookItem.volumeInfo.publisher,
             isbn10: isbn10,
             isbn13: isbn13,
-            imageUrl: googleBookItem.volumeInfo.imageLinks?.thumbnail
+            imageUrl: googleBookItem.volumeInfo.imageLinks?.thumbnail,
+            pageCount: googleBookItem.volumeInfo.pageCount,
+            categories: googleBookItem.volumeInfo.categories
         )
     }
 

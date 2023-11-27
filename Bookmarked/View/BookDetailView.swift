@@ -56,9 +56,21 @@ struct BookDetailView: View {
                             .font(.title2)
                             .foregroundColor(.secondary)
                         
+                        if let pageCount = book.pageCount {
+                            Text(pageCount > 0 ? "\(pageCount) pages" : "")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                            }
+                            
+                        if let categories = book.categories {
+                            Text(categories.joined(separator: ", "))
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                            }
+
                         if let publishedDate = book.publishedDate {
-                            Text("Published on \(formatDate(publishedDate))")
-                                .font(.callout)
+                            Text("Published \(formatDate(publishedDate))")
+                                .font(.footnote)
                                 .foregroundColor(.secondary)
                         }
                     }
@@ -92,20 +104,34 @@ struct BookDetailView: View {
             Section(header:
                 HStack {
                     Text("Avg. Rating:")
-                        .font(.title2)
-                        .bold()
+                        .font(.headline)
+                        .foregroundColor(.secondary)
                     Text(avgRating)
-                        .font(.title)
-                        .fontWeight(.black)
+                        .font(.title2)
+                        .fontWeight(.semibold)
                         .foregroundColor(Color("BookColor"))
                     Spacer()
-                    Button("Rate this book") {
-                        handleBookRating()
+                Button(action: handleBookRating) {
+                        Text("Rate This Book")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .bold()
-                    .tint(Color("BookColor"))
+                    .background(Color("BookColor"))
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("BookColor"), lineWidth: 1)
+                    )
                 }
+                .padding(.horizontal)
+                .background(Color.gray.opacity(0.08))
+                .listRowInsets(EdgeInsets(
+                        top: 0,
+                        leading: 0,
+                        bottom: 0,
+                        trailing: 0))
             ) {
                 ForEach(reviews) { review in
                     NavigationLink {

@@ -107,6 +107,7 @@ private struct BookRow: View {
                 Text(resultViewModel.authors)
                     .font(.subheadline)
                     .foregroundColor(.gray)
+                    .lineLimit(2)
                 Text(resultViewModel.publisher)
                     .font(.footnote)
                     .foregroundColor(.secondary)

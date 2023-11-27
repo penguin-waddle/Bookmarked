@@ -205,6 +205,8 @@ exports.getBookByID = functions.https.onCall(async (data, context) => {
               publishedDate: bookData.volumeInfo.publishedDate,
               publisher: bookData.volumeInfo.publisher,
               description: bookData.volumeInfo.description,
+              pageCount: bookData.volumeInfo.pageCount,
+              categories: bookData.volumeInfo.categories,
               imageLinks: {
                   smallThumbnail: bookData.volumeInfo.imageLinks?.smallThumbnail,
                   thumbnail: bookData.volumeInfo.imageLinks?.thumbnail
