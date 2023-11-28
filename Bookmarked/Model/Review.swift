@@ -25,3 +25,17 @@ struct Review: Identifiable, Codable {
                 "userID": userID ?? Auth.auth().currentUser?.uid ?? "", "bookID": bookID ?? ""]
     }
 }
+
+extension Review: Equatable {
+    static func == (lhs: Review, rhs: Review) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.title == rhs.title &&
+               lhs.body == rhs.body &&
+               lhs.rating == rhs.rating &&
+               lhs.reviewer == rhs.reviewer &&
+               lhs.userID == rhs.userID &&
+               lhs.bookID == rhs.bookID
+    }
+}
+
+

@@ -17,8 +17,9 @@
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+const functions = require('firebase-functions');
+const axios = require('axios');
+const admin = require('firebase-admin');
 admin.initializeApp();
 
 exports.addFavoriteToActivityFeed = functions.firestore
@@ -26,9 +27,13 @@ exports.addFavoriteToActivityFeed = functions.firestore
     .onCreate(async (snap, context) => {
       try {
         const favorite = snap.data();
+        const userRecord = await admin.auth().getUser(favorite.userID);
+        const userEmail = userRecord.email;
+        const displayEmail = userEmail.substring(0, 6); // Extract first 6 characters of the email
 
         // Create the activity feed item with book details
         return await admin.firestore().collection("activityFeed").add({
+          displayEmail: displayEmail, // Use displayEmail instead of userEmail
           userID: favorite.userID,
           bookID: favorite.bookID,
           book: {
@@ -53,6 +58,9 @@ exports.addReviewToActivityFeed = functions.firestore
 .onCreate(async (snap, context) => {
   try {
     const review = snap.data();
+    const userRecord = await admin.auth().getUser(review.userID);
+    const userEmail = userRecord.email;
+    const displayEmail = userEmail.substring(0, 6);
 
     // Fetch the book details
     const bookSnap = await admin.firestore().collection("books").doc(review.bookID).get();
@@ -64,6 +72,7 @@ exports.addReviewToActivityFeed = functions.firestore
 
     // Create the activity feed item with book details
     return await admin.firestore().collection("activityFeed").add({
+      displayEmail: displayEmail,
       userID: review.userID,
       bookID: review.bookID,  // Keeping bookID at root level for easy deletion
       book: {
@@ -163,3 +172,60 @@ exports.updateActivityFeedOnBookChange = functions.firestore
     return null;
   }
 });
+
+exports.getBooks = functions.https.onCall(async (data, context) => {
+  const searchTerm = data.searchTerm;
+  const apiKey = functions.config().googlebooks.key; 
+
+  try {
+      const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchTerm)}&key=${apiKey}`);
+      // Wrap the books array in an object under the 'items' key
+      return { items: response.data.items }; 
+  } catch (error) {
+      console.error("Error fetching books:", error);
+      throw new functions.https.HttpsError('unknown', 'Failed to fetch books');
+  }
+});
+
+
+exports.getBookByID = functions.https.onCall(async (data, context) => {
+  const bookID = data.bookID;
+  const apiKey = functions.config().googlebooks.key;
+
+  try {
+      const response = await axios.get(`https://www.googleapis.com/books/v1/volumes/${bookID}?key=${apiKey}`);
+      
+      // Extract the necessary data to match GoogleBookItem structure
+      const bookData = response.data;
+      const transformedData = {
+          id: bookData.id,
+          volumeInfo: {
+              title: bookData.volumeInfo.title,
+              authors: bookData.volumeInfo.authors,
+              publishedDate: bookData.volumeInfo.publishedDate,
+              publisher: bookData.volumeInfo.publisher,
+              description: bookData.volumeInfo.description,
+              pageCount: bookData.volumeInfo.pageCount,
+              categories: bookData.volumeInfo.categories,
+              imageLinks: {
+                  smallThumbnail: bookData.volumeInfo.imageLinks?.smallThumbnail,
+                  thumbnail: bookData.volumeInfo.imageLinks?.thumbnail
+              },
+              industryIdentifiers: bookData.volumeInfo.industryIdentifiers
+                  ? bookData.volumeInfo.industryIdentifiers.map(identifier => {
+                      return {
+                          type: identifier.type,
+                          identifier: identifier.identifier
+                      };
+                  })
+                  : []
+          }
+      };
+
+      return transformedData;
+  } catch (error) {
+      console.error("Error fetching book by ID:", error);
+      throw new functions.https.HttpsError('unknown', 'Failed to fetch book by ID');
+  }
+});
+

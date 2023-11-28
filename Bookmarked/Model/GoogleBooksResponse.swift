@@ -23,6 +23,8 @@ struct GoogleBookItem: Codable {
         let description: String?
         let imageLinks: ImageLinks?
         let industryIdentifiers: [IndustryIdentifier]?
+        let pageCount: Int? 
+        let categories: [String]?
         
         struct ImageLinks: Codable {
             let smallThumbnail: String

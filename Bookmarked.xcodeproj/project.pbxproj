@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E023C452B06B1F8003A7B4E /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 1E023C442B06B1F8003A7B4E /* FirebaseFunctions */; };
 		1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */; };
 		1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5370692AB90DE5005B3D8D /* BookReviewRowView.swift */; };
 		1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 1E5BCBC32A95505F00C0A1D6 /* FirebaseAuth */; };
@@ -30,9 +31,25 @@
 		1EAA82592AB5517500297279 /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA82582AB5517500297279 /* Review.swift */; };
 		1EAA825B2AB5554900297279 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA825A2AB5554900297279 /* ReviewView.swift */; };
 		1EAA825D2AB561EF00297279 /* StarsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */; };
+		1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */; };
+		1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC498112AE71D2A0056F30E /* BookSearchTests.swift */; };
 		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
 		1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */; };
+		1EE28AC62AF2DE4600272D21 /* ReviewViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC52AF2DE4600272D21 /* ReviewViewModelTests.swift */; };
+		1EE28AC82AF2E01500272D21 /* FavoriteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC72AF2E01500272D21 /* FavoriteTests.swift */; };
+		1EE28ACA2AF30B9000272D21 /* FirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC12AF2DDDD00272D21 /* FirestoreService.swift */; };
+		1EE28ACB2AF30B9800272D21 /* MockFirestoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE28AC32AF2DE1400272D21 /* MockFirestoreService.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1EC4980C2AE71CD70056F30E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1E95BD982A9540FE005B4D0D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E95BD9F2A9540FE005B4D0D;
+			remoteInfo = Bookmarked;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1E50B8182A9547B9004F6C3F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -57,7 +74,14 @@
 		1EAA82582AB5517500297279 /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
 		1EAA825A2AB5554900297279 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsSelectionView.swift; sourceTree = "<group>"; };
+		1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookmarkedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedTests.swift; sourceTree = "<group>"; };
+		1EC498112AE71D2A0056F30E /* BookSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchTests.swift; sourceTree = "<group>"; };
 		1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
+		1EE28AC12AF2DDDD00272D21 /* FirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreService.swift; sourceTree = "<group>"; };
+		1EE28AC32AF2DE1400272D21 /* MockFirestoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockFirestoreService.swift; sourceTree = "<group>"; };
+		1EE28AC52AF2DE4600272D21 /* ReviewViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewViewModelTests.swift; sourceTree = "<group>"; };
+		1EE28AC72AF2E01500272D21 /* FavoriteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,8 +92,16 @@
 				1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */,
 				1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */,
 				1E5BCBCA2A95505F00C0A1D6 /* FirebaseStorage in Frameworks */,
+				1E023C452B06B1F8003A7B4E /* FirebaseFunctions in Frameworks */,
 				1E5BCBC62A95505F00C0A1D6 /* FirebaseFirestore in Frameworks */,
 				1E5BCBC82A95505F00C0A1D6 /* FirebaseFirestoreSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1EC498052AE71CD70056F30E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				1E95BDA22A9540FE005B4D0D /* Bookmarked */,
+				1EC498092AE71CD70056F30E /* BookmarkedTests */,
 				1E95BDA12A9540FE005B4D0D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				1E95BDA02A9540FE005B4D0D /* Bookmarked.app */,
+				1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -100,6 +134,7 @@
 				1EDFAFCB2A99328B004F3AE3 /* Model */,
 				1EDFAFCC2A99329B004F3AE3 /* ViewModel */,
 				1EDFAFCD2A9932A9004F3AE3 /* View */,
+				1EE28AC92AF30A5A00272D21 /* Services */,
 				1E95BDA72A9540FF005B4D0D /* Assets.xcassets */,
 				1E5BCBCB2A9551D700C0A1D6 /* GoogleService-Info.plist */,
 				1E95BDA92A9540FF005B4D0D /* Bookmarked.entitlements */,
@@ -114,6 +149,17 @@
 				1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1EC498092AE71CD70056F30E /* BookmarkedTests */ = {
+			isa = PBXGroup;
+			children = (
+				1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */,
+				1EC498112AE71D2A0056F30E /* BookSearchTests.swift */,
+				1EE28AC52AF2DE4600272D21 /* ReviewViewModelTests.swift */,
+				1EE28AC72AF2E01500272D21 /* FavoriteTests.swift */,
+			);
+			path = BookmarkedTests;
 			sourceTree = "<group>";
 		};
 		1EDFAFCB2A99328B004F3AE3 /* Model */ = {
@@ -132,7 +178,6 @@
 			children = (
 				1E8B6F4E2A9699ED00EAB91A /* BookViewModel.swift */,
 				1E5370672AB8E83D005B3D8D /* ReviewViewModel.swift */,
-				1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */,
 				1E65A3FF2A9D7ABC00F23AE4 /* ResultsViewModel.swift */,
 			);
 			path = ViewModel;
@@ -151,6 +196,16 @@
 				1EAA825C2AB561EF00297279 /* StarsSelectionView.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		1EE28AC92AF30A5A00272D21 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1EE28AC12AF2DDDD00272D21 /* FirestoreService.swift */,
+				1EE28AC32AF2DE1400272D21 /* MockFirestoreService.swift */,
+				1E65A3FD2A9D6C7500F23AE4 /* Webservice.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,10 +230,29 @@
 				1E5BCBC72A95505F00C0A1D6 /* FirebaseFirestoreSwift */,
 				1E5BCBC92A95505F00C0A1D6 /* FirebaseStorage */,
 				1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */,
+				1E023C442B06B1F8003A7B4E /* FirebaseFunctions */,
 			);
 			productName = Bookmarked;
 			productReference = 1E95BDA02A9540FE005B4D0D /* Bookmarked.app */;
 			productType = "com.apple.product-type.application";
+		};
+		1EC498072AE71CD70056F30E /* BookmarkedTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1EC498102AE71CD70056F30E /* Build configuration list for PBXNativeTarget "BookmarkedTests" */;
+			buildPhases = (
+				1EC498042AE71CD70056F30E /* Sources */,
+				1EC498052AE71CD70056F30E /* Frameworks */,
+				1EC498062AE71CD70056F30E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1EC4980D2AE71CD70056F30E /* PBXTargetDependency */,
+			);
+			name = BookmarkedTests;
+			productName = BookmarkedTests;
+			productReference = 1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -187,11 +261,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					1E95BD9F2A9540FE005B4D0D = {
 						CreatedOnToolsVersion = 14.3.1;
+					};
+					1EC498072AE71CD70056F30E = {
+						CreatedOnToolsVersion = 15.0.1;
+						TestTargetID = 1E95BD9F2A9540FE005B4D0D;
 					};
 				};
 			};
@@ -213,6 +291,7 @@
 			projectRoot = "";
 			targets = (
 				1E95BD9F2A9540FE005B4D0D /* Bookmarked */,
+				1EC498072AE71CD70056F30E /* BookmarkedTests */,
 			);
 		};
 /* End PBXProject section */
@@ -228,6 +307,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1EC498062AE71CD70056F30E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -236,6 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E8B6F4B2A9683A800EAB91A /* Book.swift in Sources */,
+				1EE28ACA2AF30B9000272D21 /* FirestoreService.swift in Sources */,
 				1E95BDA62A9540FE005B4D0D /* LoginView.swift in Sources */,
 				1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */,
 				1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */,
@@ -243,6 +330,7 @@
 				1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */,
 				1EAA825D2AB561EF00297279 /* StarsSelectionView.swift in Sources */,
 				1E65A3FE2A9D6C7500F23AE4 /* Webservice.swift in Sources */,
+				1EE28ACB2AF30B9800272D21 /* MockFirestoreService.swift in Sources */,
 				1EAA825B2AB5554900297279 /* ReviewView.swift in Sources */,
 				1E65A4002A9D7ABC00F23AE4 /* ResultsViewModel.swift in Sources */,
 				1E967DAC2AC754C400D63D1B /* HeartView.swift in Sources */,
@@ -255,7 +343,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1EC498042AE71CD70056F30E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */,
+				1EE28AC62AF2DE4600272D21 /* ReviewViewModelTests.swift in Sources */,
+				1EE28AC82AF2E01500272D21 /* FavoriteTests.swift in Sources */,
+				1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1EC4980D2AE71CD70056F30E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1E95BD9F2A9540FE005B4D0D /* Bookmarked */;
+			targetProxy = 1EC4980C2AE71CD70056F30E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1E95BDAD2A9540FF005B4D0D /* Debug */ = {
@@ -404,6 +511,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
 				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.Bookmarked";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -445,6 +553,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
 				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.Bookmarked";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -452,6 +561,54 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		1EC4980E2AE71CD70056F30E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VCZ9KBCD6H;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
+				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.BookmarkedTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bookmarked.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bookmarked";
+			};
+			name = Debug;
+		};
+		1EC4980F2AE71CD70056F30E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VCZ9KBCD6H;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-Wl,-ld_classic";
+				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.BookmarkedTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bookmarked.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bookmarked";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -472,6 +629,15 @@
 			buildConfigurations = (
 				1E95BDB02A9540FF005B4D0D /* Debug */,
 				1E95BDB12A9540FF005B4D0D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1EC498102AE71CD70056F30E /* Build configuration list for PBXNativeTarget "BookmarkedTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1EC4980E2AE71CD70056F30E /* Debug */,
+				1EC4980F2AE71CD70056F30E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -498,6 +664,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1E023C442B06B1F8003A7B4E /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
 		1E5BCBC32A95505F00C0A1D6 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

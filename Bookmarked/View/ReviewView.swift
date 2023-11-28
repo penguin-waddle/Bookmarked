@@ -37,6 +37,7 @@ struct ReviewView: View {
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
                 .padding(.horizontal)
+                .padding(.bottom, 5)
             HStack {
                 StarsSelectionView(rating: $review.rating)
                     .disabled(!postedByThisUser) //disable if not posted by user
@@ -49,7 +50,7 @@ struct ReviewView: View {
             
             VStack (alignment: .leading) {
                 Text("Review Title:")
-                    .bold()
+                    .fontWeight(.semibold)
                 
                 TextField("title", text: $review.title)
                     .padding(.horizontal, 6)
@@ -58,8 +59,8 @@ struct ReviewView: View {
                             .stroke(.gray.opacity(0.5), lineWidth: postedByThisUser ? 2 : 0.3)
                     }
                 
-                Text("Review")
-                    .bold()
+                Text("Review:")
+                    .fontWeight(.semibold)
                 
                 TextField("review", text: $review.body, axis: .vertical)
                     .padding(.horizontal, 6)

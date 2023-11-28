@@ -13,6 +13,7 @@ import FirebaseAuth
 
 struct BookDetailView: View {
     @EnvironmentObject var bookVM: BookViewModel
+    @EnvironmentObject var firestoreService: FirestoreService
     @State private var book: Book = Book()
     @ObservedObject var resultsVM: ResultsListViewModel
 
@@ -36,6 +37,7 @@ struct BookDetailView: View {
         List {
             Section(header: EmptyView()) {
                 HStack(alignment: .top) {
+                    Text("") // Empty text for divider to span whole view
                     // Display the cover image if the imageUrl is available
                     if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
                         WebImage(url: url)
@@ -54,14 +56,27 @@ struct BookDetailView: View {
                             .font(.title2)
                             .foregroundColor(.secondary)
                         
+                        if let pageCount = book.pageCount {
+                            Text(pageCount > 0 ? "\(pageCount) pages" : "")
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                            }
+                            
+                        if let categories = book.categories {
+                            Text(categories.joined(separator: ", "))
+                                .foregroundColor(.secondary)
+                                .font(.subheadline)
+                            }
+
                         if let publishedDate = book.publishedDate {
-                            Text("Published on \(formatDate(publishedDate))")
-                                .font(.callout)
+                            Text("Published \(formatDate(publishedDate))")
+                                .font(.footnote)
                                 .foregroundColor(.secondary)
                         }
                     }
                     .padding(.leading, 16)
                 }
+                .listRowInsets(EdgeInsets())
                 .padding()
 
                 if let description = book.description {
@@ -89,20 +104,34 @@ struct BookDetailView: View {
             Section(header:
                 HStack {
                     Text("Avg. Rating:")
-                        .font(.title2)
-                        .bold()
+                        .font(.headline)
+                        .foregroundColor(.secondary)
                     Text(avgRating)
-                        .font(.title)
-                        .fontWeight(.black)
+                        .font(.title2)
+                        .fontWeight(.semibold)
                         .foregroundColor(Color("BookColor"))
                     Spacer()
-                    Button("Rate this book") {
-                        handleBookRating()
+                Button(action: handleBookRating) {
+                        Text("Rate This Book")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .bold()
-                    .tint(Color("BookColor"))
+                    .background(Color("BookColor"))
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color("BookColor"), lineWidth: 1)
+                    )
                 }
+                .padding(.horizontal)
+                .background(Color.gray.opacity(0.08))
+                .listRowInsets(EdgeInsets(
+                        top: 0,
+                        leading: 0,
+                        bottom: 0,
+                        trailing: 0))
             ) {
                 ForEach(reviews) { review in
                     NavigationLink {
@@ -160,13 +189,13 @@ struct BookDetailView: View {
                                       }
                                   }
                            }
-                       }
+        }
         .sheet(isPresented: $showReviewViewSheet) {
             NavigationStack {
                 ReviewView(book: book, review: Review())
             }
         }
-        .navigationBarItems(trailing: HeartView(book: $book, fromAPI: fromAPI))
+        .navigationBarItems(trailing: HeartView(book: $book, fromAPI: fromAPI, firestoreService: firestoreService))
     }
     
     func handleBookRating() {
@@ -201,9 +230,13 @@ struct BookDetailView: View {
 
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        BookDetailView(resultsVM: ResultsListViewModel(), bookID: "SampleBookID", activityType: .review, fromAPI: false, previewRunning: true)
+        let firestoreService = FirestoreService()
+        
+        return BookDetailView(resultsVM: ResultsListViewModel(), bookID: "SampleBookID", activityType: .review, fromAPI: false, previewRunning: true)
+            .environmentObject(firestoreService)
     }
 }
+
 
 
 

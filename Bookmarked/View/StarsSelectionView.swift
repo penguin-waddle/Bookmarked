@@ -14,7 +14,7 @@ struct StarsSelectionView: View {
     let unselected = Image(systemName: "star")
     let selected = Image(systemName: "star.fill")
     var font: Font = .largeTitle
-    let fillColor: Color = .red
+    let fillColor: Color = .yellow
     let emptyColor: Color = .gray
     
     var body: some View {

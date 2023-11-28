@@ -14,8 +14,10 @@ enum ActivityType: String, Codable {
 
 struct ActivityFeedItem: Identifiable, Codable {
     @DocumentID var id: String?
+    var displayEmail: String
     var userID: String
     var bookID: String
     var book: Book?
     var type: ActivityType
+    var timestamp: Date?
 }

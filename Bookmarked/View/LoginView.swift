@@ -19,87 +19,106 @@ struct LoginView: View {
     @State private var alertMessage = ""
     @State private var buttonsDisabled = true
     @State private var presentSheet = false
+    @State private var logoOpacity = 0.0
+    @State private var formOpacity = 0.0
     @FocusState private var focusField: Field?
     
     var body: some View {
-        VStack {
+        GeometryReader { geometry in
             VStack {
-                Image("logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 175)
-                Text("Bookmarked")
-                    .font(.largeTitle)
-                    .fontDesign(.monospaced)
-                    .foregroundColor(.cyan)
-            } .padding()
-            
-            Group {
-                TextField("E-mail", text: $email)
-                    .keyboardType(.emailAddress)
-                    .autocorrectionDisabled()
-                    .textInputAutocapitalization(.never)
-                    .submitLabel(.next)
-                    .focused($focusField, equals: .email)
-                    .onSubmit {
-                        focusField = .password
-                    }
-                    .onChange(of: email) { _ in
-                        enableButtons()
-                    }
-                
-                SecureField("Password", text: $password)
-                    .textInputAutocapitalization(.never)
-                    .submitLabel(.done)
-                    .focused($focusField, equals: .password)
-                    .onSubmit {
-                        focusField = nil
-                    }
-                    .onChange(of: password) { _ in
-                        enableButtons()
-                    }
-            }
-            .textFieldStyle(.roundedBorder)
-            .overlay {
-                RoundedRectangle(cornerRadius: 5)
-                    .stroke(.gray.opacity(0.5), lineWidth: 2)
-            }
-            .padding(.horizontal)
-            
-            HStack {
-                Button {
-                    register()
-                } label: {
-                    Text("Sign Up")
+                VStack {
+                    Image("logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 175)
+                    Text("Bookmarked")
+                        .fontWeight(.semibold)
+                        .foregroundColor(.cyan)
+                        .font(.custom("Helvetica Neue", size: 40))
                 }
-                .padding(.trailing)
+                .padding()
+                .opacity(logoOpacity)
                 
-                Button {
-                    login()
-                } label: {
-                    Text("Log In")
+                Group {
+                    TextField("E-mail", text: $email)
+                        .keyboardType(.emailAddress)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.next)
+                        .focused($focusField, equals: .email)
+                        .onSubmit {
+                            focusField = .password
+                        }
+                        .onChange(of: email) { _ in
+                            enableButtons()
+                        }
+                    
+                    SecureField("Password", text: $password)
+                        .textInputAutocapitalization(.never)
+                        .submitLabel(.done)
+                        .focused($focusField, equals: .password)
+                        .onSubmit {
+                            focusField = nil
+                        }
+                        .onChange(of: password) { _ in
+                            enableButtons()
+                        }
                 }
-                .padding(.leading)
-
+                .opacity(formOpacity)
+                .textFieldStyle(.roundedBorder)
+                //.overlay {
+                //    RoundedRectangle(cornerRadius: 5)
+                 //       .stroke(.gray.opacity(0.5), lineWidth: 2)
+                //}
+                .background(Color.white.opacity(0.7))
+                .cornerRadius(10)
+                .padding(.horizontal)
+                
+                HStack {
+                    Button {
+                        register()
+                    } label: {
+                        Text("Sign Up")
+                    }
+                    .padding(.trailing)
+                    
+                    Button {
+                        login()
+                    } label: {
+                        Text("Log In")
+                    }
+                    .padding(.leading)
+                    
+                }
+                .disabled(buttonsDisabled)
+                .buttonStyle(.borderedProminent)
+                .tint(Color("BookColor").opacity(1.0))
+                .font(.title2)
+                .padding(.top)
             }
-            .disabled(buttonsDisabled)
-            .buttonStyle(.borderedProminent)
-            .tint(Color("BookColor"))
-            .font(.title2)
-            .padding(.top)
-        }
-        .alert(alertMessage, isPresented: $showingAlert) {
-            Button("OK", role: .cancel) {}
-        }
-        .onAppear {
-            if Auth.auth().currentUser != nil {
-                print("Login successful!")
-                presentSheet = true
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .alert(alertMessage, isPresented: $showingAlert) {
+                Button("OK", role: .cancel) {}
+            }
+            .onAppear {
+                if Auth.auth().currentUser != nil {
+                    print("Login successful!")
+                    presentSheet = true
+                }
+                withAnimation(.easeIn(duration: 1.0)) {
+                    logoOpacity = 1.0
+                }
+                withAnimation(Animation.easeIn(duration: 0.5).delay(0.5)) {
+                    formOpacity = 1.0
+                }
+            }
+            .fullScreenCover(isPresented: $presentSheet) {
+                ListView()
             }
         }
-        .fullScreenCover(isPresented: $presentSheet) {
-            ListView()
-        }
+        .background(LinearGradient(gradient: Gradient(colors: [Color.white, Color.blue.opacity(0.3)]), startPoint: .top, endPoint: .bottom))
+        .edgesIgnoringSafeArea(.all)
     }
     
     func enableButtons() {
