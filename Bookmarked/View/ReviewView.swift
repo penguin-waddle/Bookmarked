@@ -15,22 +15,21 @@ struct ReviewView: View {
     @State private var rateOrReviewerString = "Rate this book:" //otherwise display poster email and date
     @StateObject var reviewVM = ReviewViewModel()
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         VStack {
             VStack (alignment: .leading) {
                 Text(book.title)
                     .font(.title)
                     .bold()
-                    .multilineTextAlignment(.leading)
-                .lineLimit(1)
-                
+                    .lineLimit(1)
+
                 Text(book.author)
                     .padding(.bottom)
             }
             .padding(.horizontal)
             .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             Text(rateOrReviewerString)
                 .font(postedByThisUser ? .title2 : .subheadline)
                 .bold(postedByThisUser)
@@ -38,45 +37,47 @@ struct ReviewView: View {
                 .lineLimit(1)
                 .padding(.horizontal)
                 .padding(.bottom, 5)
-            HStack {
-                StarsSelectionView(rating: $review.rating)
-                    .disabled(!postedByThisUser) //disable if not posted by user
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(.gray.opacity(0.5), lineWidth: postedByThisUser ? 2 : 0)
-                    }
-            }
-            .padding(.bottom)
-            
+
+            StarsSelectionView(rating: $review.rating)
+                .disabled(!postedByThisUser)
+                .padding(.bottom)
+
             VStack (alignment: .leading) {
-                Text("Review Title:")
+                Text("Title:")
                     .fontWeight(.semibold)
                 
-                TextField("title", text: $review.title)
-                    .padding(.horizontal, 6)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(.gray.opacity(0.5), lineWidth: postedByThisUser ? 2 : 0.3)
-                    }
-                
+                TextField("Title", text: $review.title)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .disabled(!postedByThisUser) // disable if not posted by user
+
                 Text("Review:")
                     .fontWeight(.semibold)
                 
-                TextField("review", text: $review.body, axis: .vertical)
-                    .padding(.horizontal, 6)
-                    .frame(maxHeight: .infinity, alignment: .topLeading)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(.gray.opacity(0.5), lineWidth: postedByThisUser ? 2 : 0.3)
+                ZStack(alignment: .topLeading) {
+                    TextEditor(text: $review.body)
+                        .frame(minHeight: 100, maxHeight: 200, alignment: .topLeading)
+                    if review.body.isEmpty {
+                        Text("Review")
+                            .foregroundColor(.gray.opacity(0.5))
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 8)
                     }
+                }
+                .disabled(!postedByThisUser)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5)
+                        .stroke(.gray.opacity(0.1), lineWidth: postedByThisUser ? 2 : 0.3)
+                    )
             }
-            .disabled(!postedByThisUser) // disable if not posted by user
-            .padding(.horizontal)
             .font(.title2)
-            
+            .padding(.horizontal)
+
             Spacer()
-            
         }
+        .background(
+            LinearGradient(gradient: Gradient(colors: [Color.white,Color.blue.opacity(0.3)]), startPoint: .top, endPoint: .bottom)
+                .opacity(0.5)
+        )
         .onAppear {
             if review.reviewer == Auth.auth().currentUser?.email {
                 postedByThisUser = true
