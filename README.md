@@ -6,6 +6,19 @@ Bookmarked is an innovative iOS app designed for avid readers. It leverages the 
 
 This project showcases my iOS development skills and commitment to creating feature-rich, user-centric applications.
 
+## Preview
+<p float="left">
+  <img src="https://github.com/penguin-waddle/Bookmarked/assets/123434744/5b678124-0b43-4bbe-b3cc-86b329a9d2f4) width="400" /> 
+  <img src="https://github.com/penguin-waddle/Bookmarked/assets/reviewing_a_book.gif](https://github.com/penguin-waddle/Bookmarked/assets/123434744/b4baf51c-49c7-4337-8e65-fb0433198d28" width="300" /> 
+</p> 
+
+<div>
+  <p>
+    Here's a quick look at <strong>Bookmarked</strong> in action. The first GIF shows the process of logging in, searching for a book, and favoriting it. The second GIF showcases how users can leave reviews for books they've read. 
+  </p>
+</div>
+
+
 ## Features
 
 * __Book Search:__ Utilize the Google Books API to search for books by title, author, or ISBN.
@@ -49,10 +62,6 @@ git clone https://github.com/penguin-waddle/Bookmarked.git
 ## Contributing
 
 Currently, Bookmarked is a personal project and not open for external contributions. However, feedback and suggestions are highly appreciated. Feel free to reach out with your ideas.
-
-## Screenshots
-
-(Include screenshots for key screens like the search feature, book detail view, review system, and the activity feed.)
 
 ## Contact
 
