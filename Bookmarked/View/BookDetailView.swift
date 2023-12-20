@@ -126,7 +126,7 @@ struct BookDetailView: View {
                     )
                 }
                 .padding(.horizontal)
-                .background(Color.gray.opacity(0.08))
+                .background(Color.gray.opacity(0.05))
                 .listRowInsets(EdgeInsets(
                         top: 0,
                         leading: 0,

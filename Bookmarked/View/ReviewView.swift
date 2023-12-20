@@ -65,7 +65,7 @@ struct ReviewView: View {
                 }
                 .disabled(!postedByThisUser)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 5)
+                        RoundedRectangle(cornerRadius: 8)
                         .stroke(.gray.opacity(0.1), lineWidth: postedByThisUser ? 2 : 0.3)
                     )
             }

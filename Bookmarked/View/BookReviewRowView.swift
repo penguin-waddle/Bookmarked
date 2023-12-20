@@ -14,7 +14,7 @@ struct BookReviewRowView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(review.title)
                 .font(.title3)
-                .fontWeight(.semibold)
+                .fontWeight(.light)
             HStack {
                 StarsSelectionView(rating: $review.rating, interactive: false, font: .callout)
                 Spacer(minLength: 8)

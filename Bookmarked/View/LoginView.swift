@@ -26,11 +26,11 @@ struct LoginView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                VStack {
+                HStack {
                     Image("logo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 175)
+                        .frame(width: 35)
                     Text("Bookmarked")
                         .fontWeight(.semibold)
                         .foregroundColor(.cyan)
@@ -38,6 +38,13 @@ struct LoginView: View {
                 }
                 .padding()
                 .opacity(logoOpacity)
+                
+                Text("Reconnect with the stories that have a special place in your heart.")
+                    .font(.body)
+                    .foregroundColor(.cyan)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .padding(.bottom, 45)
                 
                 Group {
                     TextField("E-mail", text: $email)
@@ -95,6 +102,8 @@ struct LoginView: View {
                 .tint(Color("BookColor").opacity(1.0))
                 .font(.title2)
                 .padding(.top)
+                
+            Spacer().frame(height: geometry.size.height * 0.05)
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
