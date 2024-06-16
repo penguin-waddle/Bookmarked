@@ -74,7 +74,9 @@ extension BookSearchTests {
                 description: "A book about a young wizard.",
                 imageLinks: GoogleBookItem.VolumeInfo.ImageLinks(smallThumbnail: "https://example.com/sampleimage.jpg", thumbnail: "https://example.com/sampleimage.jpg"),
                 industryIdentifiers:[GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_10", identifier: "1234567890"),
-                                     GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_13", identifier: "1234567890123")]
+                                     GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_13", identifier: "1234567890123")],
+                pageCount: 230,
+                categories: ["Fantasy"]
             )
         )
         static let sampleBook2 = GoogleBookItem(
@@ -87,7 +89,9 @@ extension BookSearchTests {
                 description: nil,
                 imageLinks: GoogleBookItem.VolumeInfo.ImageLinks(smallThumbnail: "https://example.com/sampleimage.jpg", thumbnail: "https://example.com/sampleimage.jpg"),
                 industryIdentifiers:[GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_10", identifier: "1234567890"),
-                                     GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_13", identifier: "1234567890123")]
+                                     GoogleBookItem.VolumeInfo.IndustryIdentifier(type: "ISBN_13", identifier: "1234567890123")],
+                pageCount: 250,
+                categories: ["Fantasy"]
             )
         )
     }

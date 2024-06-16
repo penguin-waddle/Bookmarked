@@ -9,7 +9,8 @@ import Foundation
 import FirebaseFirestoreSwift
 
 struct Book: Identifiable, Codable, Hashable {
-    @DocumentID var id: String?
+    @DocumentID var firestoreId: String? // Firestore Document ID
+    var id: String? // Google Books API ID
     var title: String
     var author: String
     var description: String?

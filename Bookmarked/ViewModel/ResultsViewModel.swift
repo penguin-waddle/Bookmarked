@@ -18,6 +18,7 @@ class ResultsListViewModel: ObservableObject {
     
     @Published var books: [ResultsViewModel] = []
     @Published var fetchedBook: ResultsViewModel?
+    @Published var fetchError: Error?
     
     func search(name: String) async {
         do {
@@ -30,16 +31,20 @@ class ResultsListViewModel: ObservableObject {
     }
     
     func fetchBookFromAPI(bookID: String) async {
-        do {
-            let countryCode = NSLocale.current.region?.identifier ?? "US"
-            if let googleBookItem = try await webService.getBookByID(bookID: bookID, country: countryCode) {
-                let fetchedBook = ResultsViewModel(googleBookItem: googleBookItem)
-                self.fetchedBook = fetchedBook
+            do {
+                let countryCode = NSLocale.current.region?.identifier ?? "US"
+                if let googleBookItem = try await webService.getBookByID(bookID: bookID, country: countryCode) {
+                    let fetchedBook = ResultsViewModel(googleBookItem: googleBookItem)
+                    DispatchQueue.main.async {
+                        self.fetchedBook = fetchedBook
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.fetchError = error
+                }
             }
-        } catch {
-            print(error.localizedDescription)
         }
-    }
 
 }
 

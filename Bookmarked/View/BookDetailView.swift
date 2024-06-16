@@ -13,26 +13,19 @@ import FirebaseAuth
 
 struct BookDetailView: View {
     @EnvironmentObject var bookVM: BookViewModel
-    @EnvironmentObject var firestoreService: FirestoreService
-    @State private var book: Book = Book()
+    @State var book: Book
     @ObservedObject var resultsVM: ResultsListViewModel
-
+    @EnvironmentObject var favoritesVM: FavoritesViewModel
+    
     var bookID: String
     var activityType: ActivityType
     var fromAPI: Bool = false
     
-    @FirestoreQuery(collectionPath: "invalid_path") var reviews: [Review]
     @State private var isDescriptionExpanded = false
     @State private var showReviewViewSheet = false
+    @State private var showErrorAlert: Bool = false
     var previewRunning = false
-    var avgRating: String {
-        guard reviews.count != 0 else {
-            return "-.-"
-        }
-        let averageValue = Double(reviews.reduce(0) {$0 + $1.rating}) / Double(reviews.count)
-        return String(format: "%.1f", averageValue)
-    }
-
+    
     var body: some View {
         List {
             Section(header: EmptyView()) {
@@ -60,14 +53,14 @@ struct BookDetailView: View {
                             Text(pageCount > 0 ? "\(pageCount) pages" : "")
                                 .foregroundColor(.secondary)
                                 .font(.subheadline)
-                            }
-                            
+                        }
+                        
                         if let categories = book.categories {
                             Text(categories.joined(separator: ", "))
                                 .foregroundColor(.secondary)
                                 .font(.subheadline)
-                            }
-
+                        }
+                        
                         if let publishedDate = book.publishedDate {
                             Text("Published \(formatDate(publishedDate))")
                                 .font(.footnote)
@@ -78,7 +71,7 @@ struct BookDetailView: View {
                 }
                 .listRowInsets(EdgeInsets())
                 .padding()
-
+                
                 if let description = book.description {
                     Group {
                         if isDescriptionExpanded || description.split(separator: " ").count <= 50 {
@@ -100,140 +93,167 @@ struct BookDetailView: View {
                     }
                 }
             }
-
-            Section(header:
-                HStack {
-                    Text("Avg. Rating:")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                    Text(avgRating)
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color("BookColor"))
-                    Spacer()
-                Button(action: handleBookRating) {
-                        Text("Rate This Book")
-                            .font(.headline)
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
+            
+            Section {
+                ReviewsListView(book: book, handleBookRating: handleBookRating)
+            }
+            .listRowInsets(EdgeInsets())
+        }
+        .listStyle(DefaultListStyle())
+        .font(.custom("PingFangTC-Regular", size: 16))
+        .onAppear {
+            print("BookDetailView appeared for bookID: \(bookID), fromAPI: \(fromAPI)")
+            Task {
+                if fromAPI {
+                    await bookVM.fetchBookData(bookID: bookID, firestoreId: nil, fromAPI: true, resultsVM: resultsVM)
+                    if let firestoreId = await bookVM.checkAndSetFirestoreIdForBook(book: book) {
+                        DispatchQueue.main.async {
+                            self.book.firestoreId = firestoreId
+                            favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser!.uid, firestoreId: firestoreId)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            favoritesVM.isFavorite = false
+                        }
                     }
-                    .background(Color("BookColor"))
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color("BookColor"), lineWidth: 1)
-                    )
-                }
-                .padding(.horizontal)
-                .background(Color.gray.opacity(0.05))
-                .listRowInsets(EdgeInsets(
-                        top: 0,
-                        leading: 0,
-                        bottom: 0,
-                        trailing: 0))
-            ) {
-                ForEach(reviews) { review in
-                    NavigationLink {
-                        ReviewView(book: book, review: review)
-                    } label: {
-                        BookReviewRowView(review: review)
+                } else {
+                    await bookVM.fetchBookData(bookID: book.id, firestoreId: book.firestoreId, fromAPI: false)
+                    if let firestoreId = book.firestoreId {
+                        favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser!.uid, firestoreId: firestoreId)
                     }
                 }
             }
         }
-        .listStyle(PlainListStyle())
-        .font(.custom("PingFangTC-Regular", size: 16))
-        .onAppear {
-            guard !bookID.isEmpty else {
-                print("Error: Invalid Book ID")
-                print("Book ID in BookDetailView: \(book.id ?? "Not Available")")
-                return // Exit if the book ID isn't valid
-            }
-
-            $reviews.path = "books/\(bookID)/reviews"
-
-            if fromAPI {
-                // Fetch data from Google Books API
-                if let resultViewModel = resultsVM.books.first(where: { $0.id == bookID }) {
-                    self.book = resultViewModel.book
-                }
-            } else {
-                book = bookVM.book
-                var docRef: DocumentReference!
-                
-                switch activityType {
-                case .review:
-                    // Fetch from the books collection using the bookID
-                    docRef = Firestore.firestore().collection("books").document(bookID)
-                case .favorite:
-                    // Fetch from the favorites collection using a combined ID of userID and bookID.
-                    let userId = Auth.auth().currentUser!.uid
-                    let documentId = "\(userId)_\(bookID)"
-                    docRef = Firestore.firestore().collection("favorites").document(documentId)
-                }
-                
-                docRef.getDocument { (document, error) in
-                                      if let document = document {
-                                          if document.exists {
-                                              if let fetchedBook = try? document.data(as: Book.self) {
-                                                  self.book = fetchedBook
-                                              } else {
-                                                  print("Failed to decode book from document data.")
-                                              }
-                                          } else {
-                                              print("Document does not exist at path: \(docRef.path)")
-                                          }
-                                      } else {
-                                          print("Book not found or error fetching book: \(error?.localizedDescription ?? "No error")")
-                                      }
-                                  }
-                           }
+        .onDisappear {
+            // Reset view state here
+            isDescriptionExpanded = false
+            bookVM.resetDataFetchedFlag()
+        }
+        
+        .alert("Error", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(bookVM.fetchError?.localizedDescription ?? "An unknown error occurred")
         }
         .sheet(isPresented: $showReviewViewSheet) {
             NavigationStack {
                 ReviewView(book: book, review: Review())
             }
         }
-        .navigationBarItems(trailing: HeartView(book: $book, fromAPI: fromAPI, firestoreService: firestoreService))
+        .navigationBarItems(trailing: HeartView(book: book, fromAPI: fromAPI))
     }
     
-    func handleBookRating() {
-            Task {
-                let success = await bookVM.saveBookIfNotExists(book: book)
-                if success {
-                    print("Book saved!")
-                    showReviewViewSheet.toggle()
-                } else {
-                    print("Error saving the book!")
+    
+    struct ReviewsListView: View {
+        let book: Book
+        @FirestoreQuery(collectionPath: "") var reviews: [Review]
+        var handleBookRating: () -> Void
+        
+        init(book: Book, handleBookRating: @escaping () -> Void) {
+            self.book = book
+            self.handleBookRating = handleBookRating
+            let bookID = book.firestoreId ?? book.id ?? ""
+            _reviews = FirestoreQuery(collectionPath: "books/\(bookID)/reviews")
+        }
+        
+        var averageRating: String {
+            guard !reviews.isEmpty else { return "-.-" }
+            let totalRating = reviews.reduce(0) { $0 + $1.rating }
+            let averageRating = Double(totalRating) / Double(reviews.count)
+            return String(format: "%.1f", averageRating)
+        }
+        
+        var body: some View {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Text("Average Rating: \(averageRating)")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button(action: handleBookRating) {
+                        Text("Rate This Book")
+                            .font(.headline)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                    }
+                }
+                //.padding(.horizontal)
+               // .background(Color.gray.opacity(0.1))
+                
+                ForEach(reviews) { review in
+                    NavigationLink(destination: ReviewView(book: book, review: review)) {
+                        BookReviewRowView(review: review)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .shadow(radius: 1)
+                    }
                 }
             }
+            .padding()
         }
+    }
+    
+    
+    func handleBookRating() {
+        Task {
+            if let savedBookId = await bookVM.saveBookIfNotExists(book: book) {
+                // Update the book's Firestore ID with the returned value
+                DispatchQueue.main.async {
+                    self.book.firestoreId = savedBookId
+                    self.showReviewViewSheet.toggle()
+                    print("Book confirmed saved or found with Firestore ID: \(savedBookId)")
+                }
+            } else {
+                print("Error: Failed to confirm book saved or found.")
+            }
+        }
+    }
     
     func formatDate(_ dateString: String) -> String {
-           // Create a date formatter to parse the date string
-           let inputFormatter = DateFormatter()
-           inputFormatter.dateFormat = "yyyy-MM-dd" // Assuming the original format is this
-
-           // Check if we can create a Date object from the string
-           if let date = inputFormatter.date(from: dateString) {
-               // Format the date object to the desired format
-               let outputFormatter = DateFormatter()
-               outputFormatter.dateFormat = "MMMM dd, yyyy"
-               return outputFormatter.string(from: date)
-           } else {
-               // If we cannot create a Date object, return the original string
-               return dateString
-           }
-       }
+        // Create a date formatter to parse the date string
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "yyyy-MM-dd" // Assuming the original format is this
+        
+        // Check if we can create a Date object from the string
+        if let date = inputFormatter.date(from: dateString) {
+            // Format the date object to the desired format
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "MMMM dd, yyyy"
+            return outputFormatter.string(from: date)
+        } else {
+            // If we cannot create a Date object, return the original string
+            return dateString
+        }
+    }
 }
 
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        let firestoreService = FirestoreService()
+        // Create dummy data for the preview
+        let sampleBook = Book(
+            id: "SampleBookID",
+            title: "Sample Book Title",
+            author: "Sample Author"
+            // ... include other necessary properties if needed
+        )
         
-        return BookDetailView(resultsVM: ResultsListViewModel(), bookID: "SampleBookID", activityType: .review, fromAPI: false, previewRunning: true)
-            .environmentObject(firestoreService)
+        let resultsVM = ResultsListViewModel()
+        let firestoreService = FirestoreService.shared // Ensure this is initialized correctly for the preview
+        
+        // Initialize the BookDetailView with the necessary parameters
+        BookDetailView (
+            book: sampleBook,
+            resultsVM: resultsVM,
+            bookID: sampleBook.id ?? "",
+            activityType: .review,
+            fromAPI: false
+        )
+        .environmentObject(firestoreService) // Provide the environment object if needed
     }
 }
 

@@ -4,12 +4,32 @@
 //
 //  Created by Vivien on 1/15/24.
 //
-
+import FirebaseAuth
 import SwiftUI
 import SDWebImageSwiftUI
 
+struct UserReviewsListView: View {
+    @ObservedObject var reviewViewModel: ReviewViewModel
+    var userID: String
+
+    var body: some View {
+        List(reviewViewModel.reviews, id: \.id) { review in
+            NavigationLink(destination: ReviewView(book: reviewViewModel.reviewBooks[review.id ?? ""] ?? Book(), review: review)) {
+                Text(review.title)
+            }
+        }
+        .onAppear {
+            Task {
+                await reviewViewModel.fetchReviewsByUser(userID: userID)
+            }
+        }
+    }
+}
+
 struct UserProfileView: View {
     @ObservedObject var userViewModel: UserViewModel
+    @StateObject var reviewViewModel = ReviewViewModel()
+    @StateObject var favoritesViewModel = FavoritesViewModel()
 
     var body: some View {
         ScrollView {
@@ -46,14 +66,22 @@ struct UserProfileView: View {
 
                 // Tabs for bookshelves (Reviews, Favorites, ReadLists)
                 TabView {
-                    BookShelfView(books: userViewModel.user?.reviews ?? [])
-                        .tabItem { Label("Reviews", systemImage: "star") }
-                    BookShelfView(books: userViewModel.user?.favorites ?? [])
-                        .tabItem { Label("Favorites", systemImage: "heart") }
-                    BookShelfView(books: userViewModel.user?.readLists ?? [])
-                        .tabItem { Label("ReadLists", systemImage: "list.bullet") }
+                    UserReviewsListView(reviewViewModel: reviewViewModel, userID: userViewModel.user?.id ?? "")
+                            .tabItem { Label("Reviews", systemImage: "star") }
+
+                    BookShelfView(books: favoritesViewModel.favorites)
+                            .tabItem { Label("Favorites", systemImage: "heart") }
                 }
                 .frame(height: 300)
+            }
+        }
+        .onAppear {
+            let userID = Auth.auth().currentUser?.uid ?? ""
+            userViewModel.fetchUserData(userId: userID)
+
+            Task {
+                await reviewViewModel.fetchReviewsByUser(userID: userID)
+                await favoritesViewModel.fetchFavorites(userId: userID)
             }
         }
     }

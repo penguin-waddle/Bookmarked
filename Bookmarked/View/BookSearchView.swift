@@ -25,31 +25,31 @@ struct BookSearchView: View {
     @EnvironmentObject var bookVM: BookViewModel
     @Environment(\.dismiss) private var dismiss
     @State var book: Book
-    
-    @State private var searchText: String = ""
+    @EnvironmentObject var favoritesVM: FavoritesViewModel
     @StateObject private var resultsListVM = ResultsListViewModel()
-    
+
+    @State private var searchText: String = ""
+
+    private var isShowingError: Binding<Bool> {
+        .init(
+            get: { self.resultsListVM.fetchError != nil },
+            set: { _ in self.resultsListVM.fetchError = nil }
+        )
+    }
+
     var body: some View {
         NavigationView {
             VStack {
-                // Search Bar
                 SearchBar(text: $searchText)
                     .padding(.horizontal)
                 
-                // Book List
                 List(resultsListVM.books, id: \.id) { resultViewModel in
-                    NavigationLink {
-                        BookDetailView(resultsVM: resultsListVM,
-                                       bookID: resultViewModel.book.id ?? "",
-                                       activityType: .review,
-                                       fromAPI: true)
-                    }
-                label: {
-                    BookRow(resultViewModel: resultViewModel)
-                    }
-                .onTapGesture {
-                    print("Navigating to details for book: \(String(describing: resultViewModel.book.id))")
-                                }
+                    NavigationLink(destination: {
+                        //print("Navigating to BookDetailView with bookID from API: \(resultViewModel.id ?? "N/A")")
+                        return BookDetailView(book: resultViewModel.book, resultsVM: resultsListVM, bookID: resultViewModel.id ?? "", activityType: .review, fromAPI: true)
+                    }(), label: {
+                        BookRow(resultViewModel: resultViewModel)
+                    })
                 }
                 .listStyle(.plain)
                 .onChange(of: searchText) { value in
@@ -63,13 +63,16 @@ struct BookSearchView: View {
                 }
             }
             .navigationTitle("Search Books")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button("Done") {
-                dismiss()
-            })
+            .navigationBarItems(trailing: Button("Done") { dismiss() })
+            .alert("Error", isPresented: isShowingError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(resultsListVM.fetchError?.localizedDescription ?? "An unknown error occurred during the search.")
+            }
         }
     }
 }
+
 
 private struct BookRow: View {
     let resultViewModel: ResultsViewModel
@@ -121,6 +124,8 @@ struct BookSearchView_Previews: PreviewProvider {
         NavigationStack {
             BookSearchView(book: Book())
                 .environmentObject(BookViewModel())
+                .environmentObject(FavoritesViewModel())
         }
     }
 }
+

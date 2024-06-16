@@ -7,70 +7,71 @@
 
 import XCTest
 @testable import Bookmarked
+import Combine
 
 class FavoriteTests: XCTestCase {
     
     var mockService: MockFirestoreService!
     var testBook: Book!
+    var cancellables: Set<AnyCancellable>!
     
     override func setUpWithError() throws {
-          try super.setUpWithError()
-          // Reinitialize the mock service before each test
-          mockService = MockFirestoreService()
-          // Reset the favorite books before each test
-          mockService.favoriteBooks = [:]
-          // Setup test book data
-          testBook = Book(id: "book123", title: "Test Book", author: "Author", publishedDate: "2021-10-23", imageUrl: nil)
-      }
-
-      override func tearDownWithError() throws {
-          mockService = nil
-          testBook = nil
-          try super.tearDownWithError()
-      }
-    
-    func testGetBookId() {
-        let bookId = mockService.getBookId(book: testBook, fromAPI: false)
-        XCTAssertEqual(bookId, "local_db_id_Test_Book")
+        try super.setUpWithError()
+        mockService = MockFirestoreService()
+        cancellables = []
+        // Assuming testBook has a valid firestoreId
+        testBook = Book(id: UUID().uuidString, title: "Test Book")
     }
-    
+
     func testToggleFavoriteStatus() {
-        let addExpectation = expectation(description: "Add to favorites")
-        let removeExpectation = expectation(description: "Remove from favorites")
-
-        // First, add to favorites
-        mockService.toggleFavoriteStatus(isFavorite: false, userId: "testUserId", book: testBook, fromAPI: false) { success, error in
-            XCTAssertTrue(success)
-            XCTAssertNil(error)
-            addExpectation.fulfill()
-
-            // Inside the completion handler of the first call, initiate the second call
-            self.mockService.toggleFavoriteStatus(isFavorite: true, userId: "testUserId", book: self.testBook, fromAPI: false) { success, error in
-                XCTAssertTrue(success)
-                XCTAssertNil(error)
-                removeExpectation.fulfill()
-            }
-        }
-
-        waitForExpectations(timeout: 5)
+        let expectation = XCTestExpectation(description: "Toggle favorite status should complete")
+        
+        mockService.toggleFavoriteStatus(userId: "user123", firestoreId: testBook.id!, isFavorite: false)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    XCTFail("Failed with error: \(error)")
+                }
+            }, receiveValue: { isFavorite in
+                XCTAssertFalse(isFavorite, "Book should not be favorite initially")
+                
+                self.mockService.toggleFavoriteStatus(userId: "user123", firestoreId: self.testBook.id!, isFavorite: true)
+                    .sink(receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            XCTFail("Failed with error: \(error)")
+                        }
+                    }, receiveValue: { isFavorite in
+                        XCTAssertTrue(isFavorite, "Book should be favorite after toggling")
+                        expectation.fulfill()
+                    })
+                    .store(in: &self.cancellables)
+            })
+            .store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 1.0)
     }
 
     func testCheckIfBookIsFavorite() {
-        let userId = "testUserId"
-        let bookId = mockService.getBookId(book: testBook, fromAPI: false)
-        let documentId = "\(userId)_\(bookId)"
+        let expectation = XCTestExpectation(description: "Check if book is favorite should complete")
         
-        // Manually set the book as favorite before checking
-        mockService.favoriteBooks[documentId] = true
+        mockService.toggleFavoriteStatus(userId: "user123", firestoreId: testBook.id!, isFavorite: true)
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    XCTFail("Failed with error: \(error)")
+                }
+            }, receiveValue: { _ in
+                self.mockService.checkIfBookIsFavorite(userId: "user123", firestoreId: self.testBook.id!)
+                    .sink(receiveCompletion: { completion in
+                        if case .failure(let error) = completion {
+                            XCTFail("Failed with error: \(error)")
+                        }
+                    }, receiveValue: { isFavorite in
+                        XCTAssertTrue(isFavorite, "Book should be marked as favorite")
+                        expectation.fulfill()
+                    })
+                    .store(in: &self.cancellables)
+            })
+            .store(in: &cancellables)
         
-        let expectation = self.expectation(description: "Check if book is favorite")
-        
-        mockService.checkIfBookIsFavorite(userId: userId, book: testBook, fromAPI: false) { isFavorite, _, error in
-            XCTAssertNil(error)
-            XCTAssertTrue(isFavorite)
-            expectation.fulfill()
-        }
-        
-        waitForExpectations(timeout: 5)
+        wait(for: [expectation], timeout: 1.0)
     }
 }

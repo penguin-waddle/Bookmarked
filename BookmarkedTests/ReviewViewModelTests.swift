@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import Bookmarked
+import Combine
 
 class ReviewViewModelTests: XCTestCase {
     
@@ -14,42 +15,64 @@ class ReviewViewModelTests: XCTestCase {
     var mockService: MockFirestoreService!
     var testBook: Book!
     var testReview: Review!
-
+    var cancellables: Set<AnyCancellable>!
+    
+    @MainActor
     override func setUpWithError() throws {
         try super.setUpWithError()
-        // Initialize the mock service
-        mockService = MockFirestoreService()
-        // Initialize the view model with the mock service
-        viewModel = ReviewViewModel(service: mockService)
-        // Setup the test data
-        testBook = Book(id: "book123", title: "Test Book", author: "Author", description: nil, publishedDate: "2021-10-23", imageUrl: nil)
-        testReview = Review(id: "review123", title: "Test Review", body: "Nice Book!", rating: 4, reviewer: "user@example.com", postedOn: Date(), userID: "user123", bookID: "book123")
+        setUpViewModel()
     }
-
-    override func tearDownWithError() throws {
-        // Deallocate and clean up
-        viewModel = nil
-        mockService = nil
-        testBook = nil
-        testReview = nil
-        try super.tearDownWithError()
+    
+    @MainActor func setUpViewModel() {
+        cancellables = []
+        mockService = MockFirestoreService()
+        viewModel = ReviewViewModel(firestoreService: mockService)
+        testBook = Book(id: "123", title: "Test Book")
+        testBook.firestoreId = "123"
+        testReview = Review(id: "review123", body: "Nice Book!", rating: 4)
     }
 
     func testSaveReview() async throws {
-        let success = await viewModel.saveReview(book: testBook, review: testReview)
-        XCTAssertTrue(success)
-        // Check if the review was saved correctly in the mock service
+        let expectation = XCTestExpectation(description: "Save review should complete")
+
+        do {
+            let result = try await viewModel.saveReview(book: testBook, review: testReview)
+            XCTAssertTrue(result, "Review should be saved successfully")
+            expectation.fulfill()
+        } catch {
+            XCTFail("Save review failed with error: \(error)")
+        }
+
+        await fulfillment(of: [expectation], timeout: 1.0)
     }
 
     func testDeleteReview() async throws {
-        // Ensure a clean state for the review
-        mockService.reviews.removeAll()
-        
-        let saveSuccess = await viewModel.saveReview(book: testBook, review: testReview)
-        XCTAssertTrue(saveSuccess)
+        let expectation = XCTestExpectation(description: "Delete review should complete")
 
-        let deleteSuccess = await viewModel.deleteReview(book: testBook, review: testReview)
-        XCTAssertTrue(deleteSuccess)
-        // Check if the review was deleted correctly in the mock service
+        do {
+            let result = try await viewModel.deleteReview(book: testBook, review: testReview)
+            XCTAssertTrue(result, "Review should be deleted successfully")
+            expectation.fulfill()
+        } catch {
+            XCTFail("Delete review failed with error: \(error)")
+        }
+
+        await fulfillment(of: [expectation], timeout: 1.0)
+    }
+
+    func testFetchReviewsForBook() async throws {
+        let expectation = XCTestExpectation(description: "Fetch reviews should complete")
+
+        do {
+            await viewModel.fetchReviews(for: "123")
+
+            XCTAssertEqual(viewModel.reviews.count, 1, "Should have fetched one review.")
+            XCTAssertEqual(viewModel.reviews.first?.id, "reviewTest", "Fetched review ID should match.")
+            expectation.fulfill()
+        } catch {
+            XCTFail("Fetch reviews failed with error: \(error)")
+        }
+
+        await fulfillment(of: [expectation], timeout: 1.0)
     }
 }

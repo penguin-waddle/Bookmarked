@@ -7,168 +7,221 @@
 
 import FirebaseFirestore
 import FirebaseAuth
+import Combine
 
 protocol FirestoreServiceProtocol {
-    func saveBook(_ book: Book) async -> Bool
-    func bookExists(isbn10: String?, isbn13: String?) async -> Bool
-    func saveBookIfNotExists(book: Book) async -> Bool
+    func saveBook(_ book: Book) async throws -> String
+    func bookExists(isbn10: String?, isbn13: String?) async -> String?
+    func saveBookIfNotExists(book: Book) async -> String?
     func saveReview(for book: Book, review: Review) async -> Bool
     func deleteReview(for book: Book, review: Review) async -> Bool
+    func fetchBook(byID bookID: String) async throws -> Book?
+    func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review]
+    func fetchReviewsByUser(userID: String) async throws -> [Review]
     func getBookId(book: Book, fromAPI: Bool) -> String
-    func checkIfBookIsFavorite(userId: String, book: Book, fromAPI: Bool, completion: @escaping (Bool, String?, Error?) -> Void)
-    func toggleFavoriteStatus(isFavorite: Bool, userId: String, book: Book, fromAPI: Bool, completion: @escaping (Bool, Error?) -> Void)
+    func fetchFavorites(userId: String) async throws -> [Book]
+    func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error>
+    func toggleFavoriteStatus(userId: String, firestoreId: String, book: Book, isFavorite: Bool) -> AnyPublisher<Bool, Error>
 }
 
 class FirestoreService: FirestoreServiceProtocol, ObservableObject {
     
+    static let shared = FirestoreService()
+    private init() {}
+    
     private let db = Firestore.firestore()
     
-    func saveBook(_ book: Book) async -> Bool {
-        if let id = book.id { // book already exists, so save
-            do {
-                try await db.collection("books").document(id).setData(book.dictionary)
-                return true
-            } catch {
-                print("Error: \(error.localizedDescription)")
-                return false
-            }
+    func saveBook(_ book: Book) async throws -> String {
+        var ref: DocumentReference?
+        if let firestoreId = book.firestoreId, !firestoreId.isEmpty {
+            ref = db.collection("books").document(firestoreId)
+            try await ref!.setData(book.dictionary)
         } else {
-            do {
-                try await db.collection("books").addDocument(data: book.dictionary)
-                return true
-            } catch {
-                print("Error: \(error.localizedDescription)")
-                return false
-            }
+            ref = try await db.collection("books").addDocument(data: book.dictionary)
         }
+        return ref!.documentID // Return the Firestore ID of the saved or updated book
     }
-
-    func bookExists(isbn10: String?, isbn13: String?) async -> Bool {
+    
+    func bookExists(isbn10: String?, isbn13: String?) async -> String? {
         var query: Query!
-        
+
         if let isbn10Value = isbn10 {
             query = db.collection("books").whereField("isbn10", isEqualTo: isbn10Value)
         } else if let isbn13Value = isbn13 {
             query = db.collection("books").whereField("isbn13", isEqualTo: isbn13Value)
         } else {
-            // Neither isbn10 nor isbn13 provided, so return false
-            return false
+            // If neither ISBN is provided, return nil indicating no book found
+            return nil
         }
 
         let snapshot = try? await query.getDocuments()
-        return snapshot?.documents.count ?? 0 > 0
-    }
-
-    func saveBookIfNotExists(book: Book) async -> Bool {
-        let exists = await bookExists(isbn10: book.isbn10, isbn13: book.isbn13)
-        if !exists {
-            return await saveBook(book)
+        if let document = snapshot?.documents.first {
+            // Assuming each book has a unique ISBN, returning the first match's document ID
+            return document.documentID
+        } else {
+            // No book found with the given ISBN
+            return nil
         }
-        return true
+    }
+    
+    func saveBookIfNotExists(book: Book) async -> String? {
+        // Attempt to fetch the Firestore ID by ISBN
+        let firestoreId = await bookExists(isbn10: book.isbn10, isbn13: book.isbn13)
+        
+        if let firestoreId = firestoreId {
+            // Book exists, return the existing Firestore ID
+            return firestoreId
+        } else {
+            // Book doesn't exist, attempt to save it
+            do {
+                let newFirestoreId = try await saveBook(book)
+                return newFirestoreId
+            } catch {
+                print("Error saving book: \(error)")
+                return nil
+            }
+        }
     }
     
     func saveReview(for book: Book, review: Review) async -> Bool {
-            guard let bookID = book.id else {
-                print("Error: book.id = nil")
-                return false
-            }
-            
-            var updatedReview = review
-            updatedReview.bookID = bookID  // Setting the bookID of the review
-            updatedReview.userID = Auth.auth().currentUser?.uid  // Setting the userID of the review
-            
-            let collectionString = "books/\(bookID)/reviews"
-            
-            if let id = updatedReview.id { // review already exists, so save
-                do {
-                    try await db.collection(collectionString).document(id).setData(updatedReview.dictionary)
-                    print("Data updated successfully!")
-                    return true
-                } catch {
-                    print("Error: Could not update data in 'reviews' \(error.localizedDescription)")
-                    return false
-                }
-            } else { // no id? new review to add
-                do {
-                    try await db.collection(collectionString).addDocument(data: updatedReview.dictionary)
-                    print("Data added successfully!")
-                    return true
-                } catch {
-                    print("Error: Could not create a new review in 'reviews' \(error.localizedDescription)")
-                    return false
-                }
-            }
+        guard let firestoreId = book.firestoreId else {
+            print("Error: book.firestoreId is nil")
+            return false
         }
         
-        func deleteReview(for book: Book, review: Review) async -> Bool {
-            guard let bookID = book.id, let reviewID = review.id else {
-                print("Error: book.id = \(book.id ?? "nil"), review.id = \(review.id ?? "nil"). This should not have happened.")
-                return false
+        var updatedReview = review
+        updatedReview.bookID = firestoreId  // Use Firestore ID of the book
+        updatedReview.userID = Auth.auth().currentUser?.uid  // Setting the userID of the review
+        
+        let collectionPath = "books/\(firestoreId)/reviews"
+        
+        do {
+            if let reviewId = updatedReview.id {
+                // If review has an ID, it exists and should be updated
+                try await db.collection(collectionPath).document(reviewId).setData(updatedReview.dictionary)
+            } else {
+                // New review, add it to the collection
+                _ = try await db.collection(collectionPath).addDocument(data: updatedReview.dictionary)
             }
-            
-            do {
-                let _ = try await db.collection("books").document(bookID).collection("reviews").document(reviewID).delete()
-                print("Document successfully deleted.")
-                return true
-            } catch {
-                print("Error: Removing document \(error.localizedDescription)")
-                return false
-            }
+            print("Review saved successfully")
+            return true
+        } catch {
+            print("Error saving review: \(error)")
+            return false
         }
+    }
+    
+    func deleteReview(for book: Book, review: Review) async -> Bool {
+        guard let bookID = book.id, let reviewID = review.id else {
+            print("Error: book.id = \(book.id ?? "nil"), review.id = \(review.id ?? "nil"). This should not have happened.")
+            return false
+        }
+        
+        do {
+            let _ = try await db.collection("books").document(bookID).collection("reviews").document(reviewID).delete()
+            print("Document successfully deleted.")
+            return true
+        } catch {
+            print("Error: Removing document \(error.localizedDescription)")
+            return false
+        }
+    }
+    
+    func fetchBook(byID bookID: String) async throws -> Book? {
+        let docRef = db.collection("books").document(bookID)
+        let snapshot = try await docRef.getDocument()
+        return try snapshot.data(as: Book.self)
+    }
+    
+    func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review] {
+        let reviewsRef = db.collection("books").document(firestoreId).collection("reviews")
+        let snapshot = try await reviewsRef.getDocuments()
+        return snapshot.documents.compactMap { document in
+            try? document.data(as: Review.self)
+        }
+    }
+    
+    func fetchReviewsByUser(userID: String) async throws -> [Review] {
+        let reviewsRef = db.collectionGroup("reviews").whereField("userID", isEqualTo: userID)
+        let snapshot = try await reviewsRef.getDocuments()
+        return snapshot.documents.compactMap { document -> Review? in
+            try? document.data(as: Review.self)
+        }
+    }
     
     func getBookId(book: Book, fromAPI: Bool) -> String {
-           if fromAPI {
-               return book.id ?? ""
-           } else {
-               if let range = book.id?.range(of: "_") {
-                   return String(book.id?[range.upperBound...] ?? "")
-               } else {
-                   return ""
-               }
-           }
-       }
+        if fromAPI {
+            return book.id ?? ""
+        } else {
+            if let range = book.id?.range(of: "_") {
+                return String(book.id?[range.upperBound...] ?? "")
+            } else {
+                return ""
+            }
+        }
+    }
     
-    func checkIfBookIsFavorite(userId: String, book: Book, fromAPI: Bool, completion: @escaping (Bool, String?, Error?) -> Void) {
-         let bookId = getBookId(book: book, fromAPI: fromAPI)
-         let documentId = "\(userId)_\(bookId)"
-         let favoriteDocument = db.collection("favorites").document(documentId)
+    func fetchFavorites(userId: String) async throws -> [Book] {
+        let favoritesRef = db.collection("favorites").whereField("userID", isEqualTo: userId)
+        let snapshot = try await favoritesRef.getDocuments()
+        return snapshot.documents.compactMap { document -> Book? in
+            try? document.data(as: Book.self)
+        }
+    }
+    
+    func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error> {
+            let docRef = db.collection("favorites").document("\(userId)_\(firestoreId)")
+            return Future<Bool, Error> { promise in
+                docRef.getDocument { snapshot, error in
+                    if let error = error {
+                        promise(.failure(error))
+                    } else {
+                        let exists = snapshot?.exists ?? false
+                        promise(.success(exists))
+                    }
+                }
+            }
+            .eraseToAnyPublisher()
+        }
 
-         favoriteDocument.getDocument { (documentSnapshot, error) in
-             if let error = error {
-                 completion(false, nil, error)
-             } else if let document = documentSnapshot, document.exists {
-                 completion(true, documentId, nil)
-             } else {
-                 completion(false, nil, nil)
-             }
-         }
-     }
+    func toggleFavoriteStatus(userId: String, firestoreId: String, book: Book, isFavorite: Bool) -> AnyPublisher<Bool, Error> {
+        let docRef = Firestore.firestore().collection("favorites").document("\(userId)_\(firestoreId)")
+        
+        return Future<Bool, Error> { promise in
+            if isFavorite {
+                print("Deleting favorite document:", docRef.path)  // Debugging
+                docRef.delete { error in
+                    if let error = error {
+                        print("Failed to delete favorite:", error.localizedDescription)  // Log error
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(false))  // Successfully deleted, no longer a favorite
+                    }
+                }
+            } else {
+                print("Adding favorite document:", docRef.path)  // Debugging
+                let favoriteData: [String: Any] = [
+                                "userId": userId,
+                                "bookID": book.id ?? "",
+                                "title": book.title,
+                                "author": book.author,
+                                "imageUrl": book.imageUrl ?? "",
+                                "description": book.description ?? "",
+                                "publishedDate": book.publishedDate ?? "",
+                                "publisher": book.publisher ?? "",
+                                "pageCount": book.pageCount ?? "",
+                                "categories": book.categories ?? [],
+                            ]
+                docRef.setData(favoriteData) { error in
+                    if let error = error {
+                        print("Failed to add favorite:", error.localizedDescription)  // Log error
+                        promise(.failure(error))
+                    } else {
+                        promise(.success(true))  // Successfully added, now a favorite
+                    }
+                }
+            }
+        }.eraseToAnyPublisher()
+    }
 
-    func toggleFavoriteStatus(isFavorite: Bool, userId: String, book: Book, fromAPI: Bool, completion: @escaping (Bool, Error?) -> Void) {
-         let bookId = getBookId(book: book, fromAPI: fromAPI)
-         let documentId = "\(userId)_\(bookId)"
-         let favoriteDocument = db.collection("favorites").document(documentId)
-
-         if isFavorite {
-             favoriteDocument.delete() { error in
-                 completion(error == nil, error)
-             }
-         } else {
-             let favoriteData: [String: Any] = [
-                 "userID": userId,
-                 "bookID": book.id ?? "",
-                 "title": book.title,
-                 "author": book.author,
-                 "imageUrl": book.imageUrl ?? "",
-                 "description": book.description ?? "",
-                 "publishedDate": book.publishedDate ?? "",
-                 "publisher": book.publisher ?? "",
-                 "pageCount": book.pageCount ?? "",
-                 "categories": book.categories ?? ""
-             ]
-             favoriteDocument.setData(favoriteData) { error in
-                 completion(error == nil, error)
-             }
-         }
-     }
- }
+}

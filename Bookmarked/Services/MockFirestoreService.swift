@@ -6,92 +6,90 @@
 //
 
 import Foundation
+import Combine
 
 class MockFirestoreService: FirestoreServiceProtocol {
-
-    // Mocking a simple in-memory store for tests
     var books: [String: Book] = [:]
-    var reviews: [String: Review] = [:]
-    var favoriteBooks: [String: Bool] = [:]
+    var reviews: [String: [Review]] = [:]  // Mapping Firestore ID to reviews
+    var favorites: [String: Bool] = [:]  // Maps Firestore ID to favorite status
 
-    func saveBook(_ book: Book) async -> Bool {
-        // Implement mock logic to save the book
-        // For simplicity, we're using the book's id as the key
-        if let id = book.id {
-            books[id] = book
-            return true
-        }
-        return false
+    func saveBook(_ book: Book) async throws -> String {
+        let firestoreId = book.firestoreId ?? UUID().uuidString
+        books[firestoreId] = book
+        return firestoreId
     }
 
-    func bookExists(isbn10: String?, isbn13: String?) async -> Bool {
-        // Implement mock logic to check if the book exists
-        if let isbn10Value = isbn10 {
-            return books.values.contains { $0.isbn10 == isbn10Value }
-        } else if let isbn13Value = isbn13 {
-            return books.values.contains { $0.isbn13 == isbn13Value }
+    func bookExists(isbn10: String?, isbn13: String?) async -> String? {
+        for (firestoreId, book) in books {
+            if book.isbn10 == isbn10 || book.isbn13 == isbn13 {
+                return firestoreId
+            }
         }
-        return false
+        return nil
     }
 
-    func saveBookIfNotExists(book: Book) async -> Bool {
-        if !(await bookExists(isbn10: book.isbn10, isbn13: book.isbn13)) {
-            return await saveBook(book)
+    func saveBookIfNotExists(book: Book) async -> String? {
+        if let firestoreId = await bookExists(isbn10: book.isbn10, isbn13: book.isbn13) {
+            return firestoreId
+        } else {
+            let newFirestoreId = UUID().uuidString
+            books[newFirestoreId] = book
+            return newFirestoreId
         }
-        return true
     }
 
     func saveReview(for book: Book, review: Review) async -> Bool {
-        if let id = review.id {
-            reviews[id] = review
-            return true
-        }
-        return false
+        guard let firestoreId = book.firestoreId else { return false }
+        var bookReviews = reviews[firestoreId, default: []]
+        bookReviews.append(review)
+        reviews[firestoreId] = bookReviews
+        return true
     }
 
     func deleteReview(for book: Book, review: Review) async -> Bool {
-        if let id = review.id {
-            reviews.removeValue(forKey: id)
-            return true
+        guard let firestoreId = book.firestoreId, let index = reviews[firestoreId]?.firstIndex(where: { $0.id == review.id }) else {
+            return false
         }
-        return false
+        reviews[firestoreId]?.remove(at: index)
+        return true
     }
-    
+
+    func fetchBook(byID bookID: String) async throws -> Book? {
+        guard let book = books[bookID] else {
+            throw MockError.notFound
+        }
+        return book
+    }
+     
     func getBookId(book: Book, fromAPI: Bool) -> String {
-            // Mock implementation: simply return a fixed string or a mock id based on the 'fromAPI' flag
-            if fromAPI {
-                return "mocked_api_id_for_\(book.title.replacingOccurrences(of: " ", with: "_"))"
-            } else {
-                // Mock a local database id format
-                return "local_db_id_\(book.title.replacingOccurrences(of: " ", with: "_"))"
-            }
-        }
-
-    func checkIfBookIsFavorite(userId: String, book: Book, fromAPI: Bool, completion: @escaping (Bool, String?, Error?) -> Void) {
-        let bookId = getBookId(book: book, fromAPI: fromAPI)
-        let documentId = "\(userId)_\(bookId)"
-        let isFavorite = favoriteBooks[documentId] ?? false
-        completion(isFavorite, documentId, nil)
+        return book.firestoreId ?? UUID().uuidString
     }
 
-    func toggleFavoriteStatus(isFavorite: Bool, userId: String, book: Book, fromAPI: Bool, completion: @escaping (Bool, Error?) -> Void) {
-        let bookId = getBookId(book: book, fromAPI: fromAPI)
-        let documentId = "\(userId)_\(bookId)"
-        
-        if isFavorite {
-            // Remove from favorites
-            favoriteBooks.removeValue(forKey: documentId)
-            completion(true, nil)
-        } else {
-            // Add to favorites
-            favoriteBooks[documentId] = true
-            completion(true, nil)
-        }
+    func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review] {
+        return reviews[firestoreId] ?? []
     }
 
-       // simple MockError enum to simulate different kinds of errors
-       enum MockError: Error {
-           case notFound
-       }
+    func fetchReviewsByUser(userID: String) async throws -> [Review] {
+        let allReviews = reviews.values.flatMap { $0 }
+        return allReviews.filter { $0.userID == userID }
+    }
 
+    func fetchFavorites(userId: String) async throws -> [Book] {
+        let favoriteBookIds = favorites.compactMap { $0.value ? $0.key : nil }
+        return favoriteBookIds.compactMap { books[$0] }
+    }
+
+    func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error> {
+        let isFavorite = favorites["\(userId)_\(firestoreId)"] ?? false
+        return Just(isFavorite).setFailureType(to: Error.self).eraseToAnyPublisher()
+    }
+
+    func toggleFavoriteStatus(userId: String, firestoreId: String, book: Book, isFavorite: Bool) -> AnyPublisher<Bool, Error> {
+        favorites["\(userId)_\(firestoreId)"] = !isFavorite
+        return Just(!isFavorite).setFailureType(to: Error.self).eraseToAnyPublisher()
+    }
+
+    enum MockError: Error {
+        case notFound
+    }
 }
