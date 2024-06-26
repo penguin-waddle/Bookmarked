@@ -4,7 +4,6 @@
 //
 //  Created by Vivien on 8/22/23.
 //
-
 import SwiftUI
 import SDWebImageSwiftUI
 import Firebase
@@ -43,10 +42,11 @@ struct ActivityPostView: View {
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
-                //.padding(.top)
+                
                 Text(item.book?.author ?? "Default Author")
                     .font(.subheadline)
                     .foregroundColor(.gray)
+                
                 if let timestamp = item.timestamp {
                     Text(DateFormatter.relativeFormatter.string(from: timestamp))
                         .font(.footnote)
@@ -59,21 +59,19 @@ struct ActivityPostView: View {
     }
 }
 
-
 struct ListView: View {
     @FirestoreQuery(collectionPath: "activityFeed") var feedItems: [ActivityFeedItem]
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     @EnvironmentObject var bookVM: BookViewModel
-    @State private var navigateToBookDetail = false
-    @State private var selectedBookForDetail: Book?
     @State private var sheetIsPresented = false
     @Environment(\.dismiss) private var dismiss
-    
+    @State private var selectedItem: ActivityFeedItem?
+    @State private var isBookDetailViewPresented = false
+
     var body: some View {
         NavigationStack {
             Group {
                 if feedItems.isEmpty {
-                    // Empty state view
                     VStack {
                         Image(systemName: "book.closed")
                             .resizable()
@@ -87,22 +85,17 @@ struct ListView: View {
                     }
                     .padding()
                 } else {
-                    // Normal list view
                     List {
                         ForEach(feedItems, id: \.id) { item in
                             Button(action: {
-                                fetchAndPrepareForNavigation(item: item)
+                                selectedItem = item
+                                isBookDetailViewPresented.toggle()
                             }) {
                                 ActivityPostView(item: item)
                             }
                         }
                     }
                     .listStyle(.plain)
-                    .navigationDestination(isPresented: $navigateToBookDetail) {
-                        if let selectedBook = selectedBookForDetail {
-                            BookDetailView(book: selectedBook, resultsVM: ResultsListViewModel(), bookID: selectedBook.id ?? "", activityType: .review, fromAPI: false).environmentObject(bookVM)
-                        }
-                    }
                 }
             }
             .navigationTitle("Activity Stream")
@@ -114,40 +107,21 @@ struct ListView: View {
             .sheet(isPresented: $sheetIsPresented) {
                 BookSearchView(book: Book())
             }
-        }
-    }
-    
-    func fetchAndPrepareForNavigation(item: ActivityFeedItem) {
-        guard let bookIdFromActivity = item.book?.id else {
-            print("Book ID not available")
-            return
-        }
-        
-        // Print to confirm the bookIdFromActivity value right after it's obtained.
-        print("Attempting to fetch book details for book ID: \(bookIdFromActivity)")
-        
-        Task {
-            await bookVM.fetchBookData(bookID: bookIdFromActivity, firestoreId: bookIdFromActivity, fromAPI: false)
-            
-            // Print to check if we entered the fetchBookData function
-            print("fetchBookData initiated for book ID: \(bookIdFromActivity)")
-            
-            if let fetchError = bookVM.fetchError {
-                print("Error fetching book details: \(fetchError.localizedDescription)")
-            } else {
-                // Print to confirm the book's title and ID if fetchBookData was successful
-                print("Book details fetched successfully for book: \(bookVM.book.title), ID: \(String(describing: bookVM.book.id)), firestoreID: \(String(describing: bookVM.book.firestoreId))")
-                
-                selectedBookForDetail = bookVM.book
-                navigateToBookDetail = true
-                
-                // Print to confirm navigation attempt
-                print("Navigating to BookDetailView with book: \(bookVM.book.title), ID: \(String(describing: bookVM.book.id))")
+            .navigationDestination(isPresented: $isBookDetailViewPresented) {
+                if let selectedItem = selectedItem {
+                    BookDetailView(
+                        book: selectedItem.bookVM.book ?? Book(),
+                        resultsVM: ResultsListViewModel(),
+                        bookID: selectedItem.bookVM.bookID,
+                        activityType: selectedItem.bookVM.type,
+                        fromAPI: false,
+                        fromListView: true
+                    )
+                }
             }
         }
     }
 
-    
     private var leadingToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .navigationBarLeading) {
             Button("Sign Out") {
@@ -160,7 +134,7 @@ struct ListView: View {
             }
         }
     }
-    
+
     private var trailingToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
             Button {
@@ -179,5 +153,4 @@ struct ListView_Previews: PreviewProvider {
         }
     }
 }
-
 

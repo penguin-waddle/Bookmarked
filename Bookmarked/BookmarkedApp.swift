@@ -23,9 +23,10 @@ struct BookmarkedApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LoginView()
-                .environmentObject(BookViewModel(firestoreService: FirestoreService.shared))
-                .environmentObject(FavoritesViewModel(firestoreService: FirestoreService.shared))
+                LoginView()
+                    .environmentObject(BookViewModel(firestoreService: FirestoreService.shared))
+                    .environmentObject(FavoritesViewModel(firestoreService: FirestoreService.shared))
+                    .environmentObject(ReviewViewModel(firestoreService: FirestoreService.shared))
         }
     }
 }

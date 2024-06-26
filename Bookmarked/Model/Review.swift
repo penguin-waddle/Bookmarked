@@ -10,19 +10,19 @@ import Firebase
 import FirebaseFirestoreSwift
 
 
-struct Review: Identifiable, Codable {
+struct Review: Identifiable, Codable, Hashable {
     @DocumentID var id: String?
     var title = ""
     var body = ""
     var rating = 0
     var reviewer = Auth.auth().currentUser?.email ?? ""
     var postedOn = Date()
-    var userID: String?
+    var userId: String?
     var bookID: String?
     
     var dictionary: [String: Any] {
         return ["title": title, "body": body, "rating": rating, "reviewer": reviewer, "postedOn": Timestamp(date: postedOn),
-                "userID": userID ?? Auth.auth().currentUser?.uid ?? "", "bookID": bookID ?? ""]
+                "userId": userId ?? Auth.auth().currentUser?.uid ?? "", "bookID": bookID ?? ""]
     }
 }
 
@@ -33,7 +33,7 @@ extension Review: Equatable {
                lhs.body == rhs.body &&
                lhs.rating == rhs.rating &&
                lhs.reviewer == rhs.reviewer &&
-               lhs.userID == rhs.userID &&
+               lhs.userId == rhs.userId &&
                lhs.bookID == rhs.bookID
     }
 }

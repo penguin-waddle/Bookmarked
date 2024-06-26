@@ -10,7 +10,7 @@ import SDWebImageSwiftUI
 
 struct UserReviewsListView: View {
     @ObservedObject var reviewViewModel: ReviewViewModel
-    var userID: String
+    var userId: String
 
     var body: some View {
         List(reviewViewModel.reviews, id: \.id) { review in
@@ -20,7 +20,7 @@ struct UserReviewsListView: View {
         }
         .onAppear {
             Task {
-                await reviewViewModel.fetchReviewsByUser(userID: userID)
+                await reviewViewModel.fetchReviewsByUser(userId: userId)
             }
         }
     }
@@ -66,7 +66,7 @@ struct UserProfileView: View {
 
                 // Tabs for bookshelves (Reviews, Favorites, ReadLists)
                 TabView {
-                    UserReviewsListView(reviewViewModel: reviewViewModel, userID: userViewModel.user?.id ?? "")
+                    UserReviewsListView(reviewViewModel: reviewViewModel, userId: userViewModel.user?.id ?? "")
                             .tabItem { Label("Reviews", systemImage: "star") }
 
                     BookShelfView(books: favoritesViewModel.favorites)
@@ -76,12 +76,12 @@ struct UserProfileView: View {
             }
         }
         .onAppear {
-            let userID = Auth.auth().currentUser?.uid ?? ""
-            userViewModel.fetchUserData(userId: userID)
+            let userId = Auth.auth().currentUser?.uid ?? ""
+            userViewModel.fetchUserData(userId: userId)
 
             Task {
-                await reviewViewModel.fetchReviewsByUser(userID: userID)
-                await favoritesViewModel.fetchFavorites(userId: userID)
+                await reviewViewModel.fetchReviewsByUser(userId: userId)
+                await favoritesViewModel.fetchFavorites(userId: userId)
             }
         }
     }

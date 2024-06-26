@@ -1,4 +1,5 @@
 {
+  "originHash" : "8aa166c7be794b67c0165ed2c1bfd8d4c566b25f812e846817e12406356b58cb",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -7,6 +8,15 @@
       "state" : {
         "revision" : "bfc0b6f81adc06ce5121eb23f628473638d67c5c",
         "version" : "1.2022062300.0"
+      }
+    },
+    {
+      "identity" : "expandabletext",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/NuPlay/ExpandableText.git",
+      "state" : {
+        "revision" : "d140b404c6683bb169bb01ef4eeecdb6d9be8fb8",
+        "version" : "1.2.0"
       }
     },
     {
@@ -127,5 +137,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -17,7 +17,7 @@ protocol FirestoreServiceProtocol {
     func deleteReview(for book: Book, review: Review) async -> Bool
     func fetchBook(byID bookID: String) async throws -> Book?
     func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review]
-    func fetchReviewsByUser(userID: String) async throws -> [Review]
+    func fetchReviewsByUser(userId: String) async throws -> [Review]
     func getBookId(book: Book, fromAPI: Bool) -> String
     func fetchFavorites(userId: String) async throws -> [Book]
     func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error>
@@ -91,7 +91,7 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
         
         var updatedReview = review
         updatedReview.bookID = firestoreId  // Use Firestore ID of the book
-        updatedReview.userID = Auth.auth().currentUser?.uid  // Setting the userID of the review
+        updatedReview.userId = Auth.auth().currentUser?.uid  // Setting the userId of the review
         
         let collectionPath = "books/\(firestoreId)/reviews"
         
@@ -128,21 +128,26 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
     }
     
     func fetchBook(byID bookID: String) async throws -> Book? {
-        let docRef = db.collection("books").document(bookID)
-        let snapshot = try await docRef.getDocument()
-        return try snapshot.data(as: Book.self)
-    }
+            print("FirestoreService: Fetching book with ID \(bookID)")
+            let docRef = db.collection("books").document(bookID)
+            let snapshot = try await docRef.getDocument()
+            let book = try? snapshot.data(as: Book.self)
+            print("FirestoreService: Fetched book: \(String(describing: book))")
+            return book
+        }
     
     func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review] {
         let reviewsRef = db.collection("books").document(firestoreId).collection("reviews")
         let snapshot = try await reviewsRef.getDocuments()
-        return snapshot.documents.compactMap { document in
+        let reviews = snapshot.documents.compactMap { document in
             try? document.data(as: Review.self)
         }
+        //print("Fetched reviews from Firestore: \(reviews)")
+        return reviews
     }
     
-    func fetchReviewsByUser(userID: String) async throws -> [Review] {
-        let reviewsRef = db.collectionGroup("reviews").whereField("userID", isEqualTo: userID)
+    func fetchReviewsByUser(userId: String) async throws -> [Review] {
+        let reviewsRef = db.collectionGroup("reviews").whereField("userId", isEqualTo: userId)
         let snapshot = try await reviewsRef.getDocuments()
         return snapshot.documents.compactMap { document -> Review? in
             try? document.data(as: Review.self)
@@ -162,7 +167,7 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
     }
     
     func fetchFavorites(userId: String) async throws -> [Book] {
-        let favoritesRef = db.collection("favorites").whereField("userID", isEqualTo: userId)
+        let favoritesRef = db.collection("favorites").whereField("userId", isEqualTo: userId)
         let snapshot = try await favoritesRef.getDocuments()
         return snapshot.documents.compactMap { document -> Book? in
             try? document.data(as: Book.self)
@@ -202,7 +207,7 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
                 print("Adding favorite document:", docRef.path)  // Debugging
                 let favoriteData: [String: Any] = [
                                 "userId": userId,
-                                "bookID": book.id ?? "",
+                                "bookID": firestoreId, 
                                 "title": book.title,
                                 "author": book.author,
                                 "imageUrl": book.imageUrl ?? "",

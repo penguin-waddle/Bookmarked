@@ -17,79 +17,90 @@
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
-const functions = require('firebase-functions/v1'); // Use the v1 API
+const functions = require('firebase-functions/v1');
 const axios = require('axios');
 const admin = require('firebase-admin');
+const bodyParser = require('body-parser');
+const express = require('express');
 admin.initializeApp();
 
 exports.addFavoriteToActivityFeed = functions.firestore
     .document("favorites/{favoriteId}")
     .onCreate(async (snap, context) => {
+      console.log("addFavoriteToActivityFeed triggered");
+      try {
         const favorite = snap.data();
-        const userRecord = await admin.auth().getUser(favorite.userID);
-        const displayEmail = userRecord.email.substring(0, 6); // Extract first 6 characters of the email
+        console.log("Favorite data:", favorite);
+        const userRecord = await admin.auth().getUser(favorite.userId);
+        const userEmail = userRecord.email;
+        const displayEmail = userEmail.substring(0, 6);
+        console.log("User record fetched:", userRecord);
 
-        // favorite.firestoreId is the Firestore ID of the book
-        const bookRef = admin.firestore().collection("books").doc(favorite.firestoreId);
-        const bookSnap = await bookRef.get();
-        if (!bookSnap.exists) {
-            console.error("Book not found with Firestore ID:", favorite.firestoreId);
-            return null;
-        }
-        const book = bookSnap.data();
+        const activityFeedItem = {
+          displayEmail: displayEmail,
+          userId: favorite.userId,
+          bookID: favorite.bookID,
+          book: {
+            id: favorite.bookID,
+            title: favorite.title,
+            author: favorite.author,
+            imageUrl: favorite.imageUrl
+          },
+          type: "favorite",
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        console.log("Activity feed item:", activityFeedItem);
 
-        // Create the activity feed item with dynamically fetched book details
-        return admin.firestore().collection("activityFeed").add({
-            displayEmail,
-            userID: favorite.userID,
-            bookID: favorite.firestoreId, // Store Firestore ID
-            book: {
-                id: favorite.firestoreId, // Firestore ID
-                title: book.title,
-                author: book.author,
-                imageUrl: book.imageUrl
-            },
-            type: "favorite",
-            timestamp: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        await admin.firestore().collection("activityFeed").add(activityFeedItem);
+        console.log("Activity feed item added successfully");
+      } catch (error) {
+        console.error("Error adding favorite to activity feed:", error);
+      }
     });
 
 exports.addReviewToActivityFeed = functions.firestore
-.document("books/{bookId}/reviews/{reviewId}")
-.onCreate(async (snap, context) => {
-  try {
-    const review = snap.data();
-    const userRecord = await admin.auth().getUser(review.userID);
-    const userEmail = userRecord.email;
-    const displayEmail = userEmail.substring(0, 6);
+    .document("books/{bookId}/reviews/{reviewId}")
+    .onCreate(async (snap, context) => {
+      console.log("addReviewToActivityFeed triggered");
+      try {
+        const review = snap.data();
+        console.log("Review data:", review);
+        const userRecord = await admin.auth().getUser(review.userId);
+        const userEmail = userRecord.email;
+        const displayEmail = userEmail.substring(0, 6);
+        console.log("User record fetched:", userRecord);
 
-    // Fetch the book details
-    const bookSnap = await admin.firestore().collection("books").doc(review.firestoreId).get();
-    if (!bookSnap.exists) {
-      console.error("Book not found!");
-      return null; 
-    }
-    const book = bookSnap.data();
+        const bookSnap = await admin.firestore().collection("books").doc(review.bookID).get();
+        if (!bookSnap.exists) {
+          console.error("Book not found!");
+          return null;
+        }
+        const bookData = bookSnap.data();
+        console.log("Book data:", bookData);
 
-    // Create the activity feed item with dynamically fetched book details
-    return admin.firestore().collection("activityFeed").add({
-        displayEmail,
-        userID: review.userID,
-        bookID: review.firestoreId, // Store Firestore ID
-        book: {
-            id: review.firestoreId, // Firestore ID
-            title: book.title,
-            author: book.author,
-            imageUrl: book.imageUrl
-        },
-        type: "review",
-        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        const activityFeedItem = {
+          displayEmail: displayEmail,
+          userId: review.userId,
+          bookID: review.bookID,
+          book: {
+            id: bookSnap.id,
+            title: bookData.title,
+            author: bookData.author,
+            imageUrl: bookData.imageUrl
+          },
+          type: "review",
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        };
+        console.log("Activity feed item:", activityFeedItem);
+
+        await admin.firestore().collection("activityFeed").add(activityFeedItem);
+        console.log("Activity feed item added successfully");
+      } catch (error) {
+        console.error("Error adding review to activity feed:", error);
+      }
     });
-  } catch (error) {
-    console.error("Error adding review to activity feed:", error);
-    return null; 
-  }
-});
+
+
 
 exports.removeFavoriteFromActivityFeed = functions.firestore
     .document("favorites/{favoriteId}")
@@ -97,7 +108,7 @@ exports.removeFavoriteFromActivityFeed = functions.firestore
       try {
         const favorite = snap.data();
         const feedItems = await admin.firestore().collection("activityFeed")
-            .where("userID", "==", favorite.userID)
+            .where("userId", "==", favorite.userId)
             .where("bookID", "==", favorite.bookID)
             .where("type", "==", "favorite")
             .get();
@@ -121,7 +132,7 @@ exports.removeReviewFromActivityFeed = functions.firestore
       try {
         const review = snap.data();
         const feedItems = await admin.firestore().collection("activityFeed")
-            .where("userID", "==", review.userID)
+            .where("userId", "==", review.userId)
             .where("bookID", "==", review.bookID)
             .where("type", "==", "review")
             .get();
@@ -139,32 +150,39 @@ exports.removeReviewFromActivityFeed = functions.firestore
       }
     });
 
+
+
 exports.updateActivityFeedOnBookChange = functions.firestore
-    .document("books/{bookId}")
-    .onUpdate(async (change, context) => {
-        const { bookId } = context.params;
-        const newBookData = change.after.data();
+.document("books/{bookId}")
+.onUpdate(async (change, context) => {
+  try {
+    const newBookData = change.after.data();
+    const oldBookData = change.before.data();
+    
+    // Check if the relevant fields (that are stored in activity feed) have changed
+    if (newBookData.title !== oldBookData.title || newBookData.author !== oldBookData.author || newBookData.imageUrl !== oldBookData.imageUrl) {
+      const bookId = change.after.id;
+      const feedItems = await admin.firestore().collection("activityFeed").where("book.id", "==", bookId).get();
 
-        // Update activity feed to reflect new book details
-        const activityFeedUpdates = admin.firestore().collection("activityFeed")
-            .where("bookID", "==", bookId)
-            .get()
-            .then(snapshot => {
-                const batch = admin.firestore().batch();
-                snapshot.forEach(doc => {
-                    // Updating the following details in activity feed items
-                    batch.update(doc.ref, {
-                        "book.title": newBookData.title,
-                        "book.author": newBookData.author,
-                        "book.imageUrl": newBookData.imageUrl
-                    });
-                });
-                return batch.commit();
-            });
-
-        // Wait for the activity feed updates to complete
-        await Promise.all([activityFeedUpdates]);
-    });
+      const batch = admin.firestore().batch();
+      feedItems.docs.forEach(doc => {
+        const docRef = admin.firestore().collection("activityFeed").doc(doc.id);
+        batch.update(docRef, {
+          "book.title": newBookData.title,
+          "book.author": newBookData.author,
+          "book.imageUrl": newBookData.imageUrl
+        });
+      });
+      
+      return await batch.commit();
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error updating activity feed on book change:", error);
+    return null;
+  }
+});
 
 exports.getBooks = functions.https.onCall(async (data, context) => {
   const searchTerm = data.searchTerm;

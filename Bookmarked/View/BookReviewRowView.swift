@@ -4,8 +4,8 @@
 //
 //  Created by Vivien on 9/18/23.
 //
-
 import SwiftUI
+import ExpandableText
 
 struct BookReviewRowView: View {
     @State var review: Review
@@ -15,15 +15,23 @@ struct BookReviewRowView: View {
             Text(review.title)
                 .font(.title3)
                 .fontWeight(.light)
-            HStack {
-                StarsSelectionView(rating: $review.rating, interactive: false, font: .callout)
-                Spacer(minLength: 8)
-                Text(review.body)
-                    .font(.callout)
-                    .lineLimit(1)
-                    .foregroundColor(.secondary)
-            }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            StarsSelectionView(rating: $review.rating, interactive: false, font: .callout)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            ExpandableText(text: review.body)
+                .font(.body)
+                .foregroundColor(.primary)
+                .lineLimit(3)
+                .expandButton(TextSet(text: "more", font: .body, color: .blue))
+                .collapseButton(TextSet(text: "less", font: .body, color: .blue))
+                .expandAnimation(.easeOut)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .buttonStyle(BorderlessButtonStyle())
+        .frame(maxWidth: .infinity)
+        .padding()
         .padding(.vertical, 4)
     }
 }
@@ -31,3 +39,4 @@ struct BookReviewRowView: View {
 #Preview {
     BookReviewRowView(review: Review(title: "Great book!", body: "Made me cry, lots of emotional moments. Only critique are the plot holes.", rating: 4))
 }
+

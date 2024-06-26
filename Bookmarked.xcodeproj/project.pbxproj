@@ -37,6 +37,7 @@
 		1EB182E02B55D80D0027105A /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB182DF2B55D80D0027105A /* UserProfileView.swift */; };
 		1EB182E22B55E2220027105A /* MetricView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB182E12B55E2220027105A /* MetricView.swift */; };
 		1EB182E42B55E2510027105A /* BookShelfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB182E32B55E2510027105A /* BookShelfView.swift */; };
+		1EBE2DF42C25C52A0012F423 /* ExpandableText in Frameworks */ = {isa = PBXBuildFile; productRef = 1EBE2DF32C25C52A0012F423 /* ExpandableText */; };
 		1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */; };
 		1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC498112AE71D2A0056F30E /* BookSearchTests.swift */; };
 		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
@@ -101,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1EBE2DF42C25C52A0012F423 /* ExpandableText in Frameworks */,
 				1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */,
 				1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */,
 				1E5BCBCA2A95505F00C0A1D6 /* FirebaseStorage in Frameworks */,
@@ -126,6 +128,7 @@
 				1E95BDA22A9540FE005B4D0D /* Bookmarked */,
 				1EC498092AE71CD70056F30E /* BookmarkedTests */,
 				1E95BDA12A9540FE005B4D0D /* Products */,
+				1EBE2DF12C25C4630012F423 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -161,6 +164,13 @@
 				1E95BDAB2A9540FF005B4D0D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		1EBE2DF12C25C4630012F423 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		1EC498092AE71CD70056F30E /* BookmarkedTests */ = {
@@ -249,6 +259,7 @@
 				1E5BCBC92A95505F00C0A1D6 /* FirebaseStorage */,
 				1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */,
 				1E023C442B06B1F8003A7B4E /* FirebaseFunctions */,
+				1EBE2DF32C25C52A0012F423 /* ExpandableText */,
 			);
 			productName = Bookmarked;
 			productReference = 1E95BDA02A9540FE005B4D0D /* Bookmarked.app */;
@@ -303,6 +314,7 @@
 			packageReferences = (
 				1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+				1EBE2DF22C25C5290012F423 /* XCRemoteSwiftPackageReference "ExpandableText" */,
 			);
 			productRefGroup = 1E95BDA12A9540FE005B4D0D /* Products */;
 			projectDirPath = "";
@@ -677,6 +689,14 @@
 				minimumVersion = 10.0.0;
 			};
 		};
+		1EBE2DF22C25C5290012F423 /* XCRemoteSwiftPackageReference "ExpandableText" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/NuPlay/ExpandableText.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
 		1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
@@ -712,6 +732,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		1EBE2DF32C25C52A0012F423 /* ExpandableText */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EBE2DF22C25C5290012F423 /* XCRemoteSwiftPackageReference "ExpandableText" */;
+			productName = ExpandableText;
 		};
 		1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;

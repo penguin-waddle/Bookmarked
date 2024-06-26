@@ -7,15 +7,17 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import FirebaseAuth
 
 struct BookShelfView: View {
     var books: [Book]
-    
+    @EnvironmentObject var bookVM: BookViewModel
+
     var body: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 20) {
             ForEach(books, id: \.self) { book in
                 if let firestoreId = book.firestoreId {
-                    NavigationLink(destination: BookDetailView(book: book, resultsVM: ResultsListViewModel(), bookID: firestoreId, activityType: .review, fromAPI: false)) {
+                    NavigationLink(destination: BookDetailViewWrapper(book: book, bookID: firestoreId)) {
                         bookThumbnailView(book)
                     }
                 }
@@ -23,7 +25,7 @@ struct BookShelfView: View {
         }
         .padding()
     }
-    
+
     @ViewBuilder
     private func bookThumbnailView(_ book: Book) -> some View {
         if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
@@ -41,6 +43,31 @@ struct BookShelfView: View {
     }
 }
 
+struct BookDetailViewWrapper: View {
+    @EnvironmentObject var bookVM: BookViewModel
+    @EnvironmentObject var favoritesVM: FavoritesViewModel
+    @EnvironmentObject var reviewVM: ReviewViewModel
+
+    let book: Book
+    let bookID: String
+
+    var body: some View {
+        BookDetailView(
+            resultsVM: ResultsListViewModel(), 
+            bookID: bookID,
+            activityType: .review,
+            fromAPI: false,
+            fromListView: true
+        )
+        .onAppear {
+            bookVM.book = book
+            favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser!.uid, firestoreId: bookID)
+            Task {
+                await reviewVM.fetchReviews(for: bookID)
+            }
+        }
+    }
+}
 
 struct BookShelfView_Previews: PreviewProvider {
     static var previews: some View {
@@ -52,7 +79,8 @@ struct BookShelfView_Previews: PreviewProvider {
 
         BookShelfView(books: sampleBooks)
             .previewLayout(.sizeThatFits)
+            .environmentObject(BookViewModel())
+            .environmentObject(FavoritesViewModel())
+            .environmentObject(ReviewViewModel())
     }
 }
-
-

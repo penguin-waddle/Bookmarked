@@ -12,10 +12,10 @@ enum ActivityType: String, Codable {
     case review, favorite
 }
 
-struct ActivityFeedItem: Identifiable, Codable {
+struct ActivityFeedItem: Identifiable, Codable, Hashable {
     @DocumentID var id: String?
     var displayEmail: String
-    var userID: String
+    var userId: String
     var bookID: String
     var book: Book?
     var type: ActivityType
