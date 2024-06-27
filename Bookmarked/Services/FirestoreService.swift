@@ -128,22 +128,30 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
     }
     
     func fetchBook(byID bookID: String) async throws -> Book? {
-            print("FirestoreService: Fetching book with ID \(bookID)")
+        print("FirestoreService: Fetching book with ID \(bookID)")
+        do {
             let docRef = db.collection("books").document(bookID)
             let snapshot = try await docRef.getDocument()
-            let book = try? snapshot.data(as: Book.self)
-            print("FirestoreService: Fetched book: \(String(describing: book))")
+            let book = try snapshot.data(as: Book.self)
             return book
+        } catch {
+            print("Error fetching book: \(error.localizedDescription)")
+            throw error
         }
+    }
     
     func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review] {
-        let reviewsRef = db.collection("books").document(firestoreId).collection("reviews")
-        let snapshot = try await reviewsRef.getDocuments()
-        let reviews = snapshot.documents.compactMap { document in
-            try? document.data(as: Review.self)
+        do {
+            let reviewsRef = db.collection("books").document(firestoreId).collection("reviews")
+            let snapshot = try await reviewsRef.getDocuments()
+            let reviews = snapshot.documents.compactMap { document in
+                try? document.data(as: Review.self)
+            }
+            return reviews
+        } catch {
+            print("Error fetching reviews: \(error.localizedDescription)")
+            throw error
         }
-        //print("Fetched reviews from Firestore: \(reviews)")
-        return reviews
     }
     
     func fetchReviewsByUser(userId: String) async throws -> [Review] {
@@ -175,19 +183,21 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
     }
     
     func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error> {
-            let docRef = db.collection("favorites").document("\(userId)_\(firestoreId)")
-            return Future<Bool, Error> { promise in
-                docRef.getDocument { snapshot, error in
-                    if let error = error {
-                        promise(.failure(error))
-                    } else {
-                        let exists = snapshot?.exists ?? false
-                        promise(.success(exists))
-                    }
+        let docRef = db.collection("favorites").document("\(userId)_\(firestoreId)")
+        return Future<Bool, Error> { promise in
+            docRef.getDocument { snapshot, error in
+                if let error = error {
+                    print("Error checking favorite status: \(error.localizedDescription)")
+                    promise(.failure(error))
+                } else {
+                    let exists = snapshot?.exists ?? false
+                    promise(.success(exists))
                 }
             }
-            .eraseToAnyPublisher()
         }
+        .eraseToAnyPublisher()
+    }
+
 
     func toggleFavoriteStatus(userId: String, firestoreId: String, book: Book, isFavorite: Bool) -> AnyPublisher<Bool, Error> {
         let docRef = Firestore.firestore().collection("favorites").document("\(userId)_\(firestoreId)")

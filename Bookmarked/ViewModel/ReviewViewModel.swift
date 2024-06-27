@@ -79,4 +79,11 @@ class ReviewViewModel: ObservableObject {
             }
         }
     }
+    
+    func resetData() {
+        DispatchQueue.main.async {
+            self.reviews = []
+            self.error = nil
+        }
+    }
 }

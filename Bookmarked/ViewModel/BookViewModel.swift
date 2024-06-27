@@ -19,12 +19,14 @@ class BookViewModel: ObservableObject {
     @Published var book = Book()
     @Published var isFromAPI: Bool = false
     @Published var fetchError: Error?
-    @Published var dataFetched = false // Tracks if data has been fetched already
+    @Published var dataFetched = false
     
     func saveBook(book: Book) async -> Bool {
         do {
             let firestoreId = try await firestoreService.saveBook(book)
-            self.book.firestoreId = firestoreId
+            DispatchQueue.main.async {
+                self.book.firestoreId = firestoreId
+            }
             return true
         } catch {
             print("Error saving book: \(error)")
@@ -37,11 +39,10 @@ class BookViewModel: ObservableObject {
     }
     
     func saveBookIfNotExists(book: Book) async -> String? {
-        // Attempt to save the book and retrieve the Firestore ID
         if let firestoreId = await firestoreService.saveBookIfNotExists(book: book) {
-            // Since both `book.id` and `firestoreId` are not nil here, we can use them safely.
-            // Update the book's Firestore ID and fetch data.
-            self.book.firestoreId = firestoreId
+            DispatchQueue.main.async {
+                self.book.firestoreId = firestoreId
+            }
             await fetchBookData(bookID: book.id, firestoreId: firestoreId, fromAPI: isFromAPI)
             return firestoreId
         } else {
@@ -52,10 +53,14 @@ class BookViewModel: ObservableObject {
     
     func fetchBookData(bookID: String?, firestoreId: String?, fromAPI: Bool, resultsVM: ResultsListViewModel? = nil) async {
         guard let bookID = bookID, !bookID.isEmpty else {
-            fetchError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid Book ID"])
+            DispatchQueue.main.async {
+                self.fetchError = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid Book ID"])
+            }
             return
         }
-        print("Fetching data for Book ID: \(bookID) with Firestore ID: \(String(describing: firestoreId)) from API: \(fromAPI)")
+        
+        print("fetchBookData called with bookID: \(bookID), firestoreId: \(String(describing: firestoreId)), fromAPI: \(fromAPI)")
+        
         self.isFromAPI = fromAPI
         if fromAPI {
             await resultsVM?.fetchBookFromAPI(bookID: bookID)
@@ -65,42 +70,42 @@ class BookViewModel: ObservableObject {
                 }
             } else if let fetchedBook = resultsVM?.fetchedBook?.book {
                 DispatchQueue.main.async {
+                    //print("Fetched book from API: \(fetchedBook)")
                     self.book = fetchedBook
                     self.dataFetched = true
-                    self.objectWillChange.send()
                 }
             }
         } else {
-             do {
-                 if let firestoreId = firestoreId {
-                     print("Attempting to fetch book with Firestore ID: \(firestoreId)")
-                     if let fetchedBook = try await firestoreService.fetchBook(byID: firestoreId) {
-                         DispatchQueue.main.async {
-                             self.book = fetchedBook
-                             self.dataFetched = true
-                             self.objectWillChange.send()
-                         }
-                         return
-                     }
-                 }
-                 
-                 print("Attempting to fetch book with Book ID: \(bookID)")
-                 if let fetchedBook = try await firestoreService.fetchBook(byID: bookID) {
-                     DispatchQueue.main.async {
-                         self.book = fetchedBook
-                         self.dataFetched = true
-                         self.objectWillChange.send()
-                     }
-                 } else {
-                     print("Did not find a book with Book ID: \(bookID)")
-                 }
-             } catch {
-                 DispatchQueue.main.async {
-                     self.fetchError = error
-                 }
-             }
-         }
-     }
+            do {
+                if let firestoreId = firestoreId {
+                    print("Attempting to fetch book with Firestore ID: \(firestoreId)")
+                    if let fetchedBook = try await firestoreService.fetchBook(byID: firestoreId) {
+                        DispatchQueue.main.async {
+                            //print("Fetched book from Firestore: \(fetchedBook)")
+                            self.book = fetchedBook
+                            self.dataFetched = true
+                        }
+                        return
+                    }
+                }
+                
+                print("Attempting to fetch book with Book ID: \(bookID)")
+                if let fetchedBook = try await firestoreService.fetchBook(byID: bookID) {
+                    DispatchQueue.main.async {
+                        //print("Fetched book from Firestore: \(fetchedBook)")
+                        self.book = fetchedBook
+                        self.dataFetched = true
+                    }
+                } else {
+                    print("Did not find a book with Book ID: \(bookID)")
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.fetchError = error
+                }
+            }
+        }
+    }
     
     func resetDataFetchedFlag() {
         DispatchQueue.main.async {
@@ -109,10 +114,21 @@ class BookViewModel: ObservableObject {
     }
     
     func checkAndSetFirestoreIdForBook(book: Book) async -> String? {
-            if await bookExists(isbn10: book.isbn10, isbn13: book.isbn13) {
-                return await firestoreService.bookExists(isbn10: book.isbn10, isbn13: book.isbn13)
-            } else {
-                return nil
-            }
+        if await bookExists(isbn10: book.isbn10, isbn13: book.isbn13) {
+            return await firestoreService.bookExists(isbn10: book.isbn10, isbn13: book.isbn13)
+        } else {
+            return nil
         }
+    }
+    
+    func resetData() {
+        DispatchQueue.main.async {
+            print("Resetting BookViewModel data")
+            self.book = Book()
+            self.isFromAPI = false
+            self.fetchError = nil
+            self.dataFetched = false
+        }
+    }
 }
+

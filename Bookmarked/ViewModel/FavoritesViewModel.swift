@@ -131,5 +131,13 @@ class FavoritesViewModel: ObservableObject {
             }
         }
     }
+    
+    func resetData() {
+        DispatchQueue.main.async {
+            self.isFavorite = false
+            self.error = nil
+            self.isLoading = false
+        }
+    }
 }
 

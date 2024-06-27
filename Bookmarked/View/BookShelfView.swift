@@ -53,7 +53,9 @@ struct BookDetailViewWrapper: View {
 
     var body: some View {
         BookDetailView(
-            resultsVM: ResultsListViewModel(), 
+            bookVM: bookVM,
+            resultsVM: ResultsListViewModel(),
+            book: book, 
             bookID: bookID,
             activityType: .review,
             fromAPI: false,

@@ -67,6 +67,7 @@ struct ListView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedItem: ActivityFeedItem?
     @State private var isBookDetailViewPresented = false
+    @State private var selectedBook: Book?
 
     var body: some View {
         NavigationStack {
@@ -89,7 +90,7 @@ struct ListView: View {
                         ForEach(feedItems, id: \.id) { item in
                             Button(action: {
                                 selectedItem = item
-                                isBookDetailViewPresented.toggle()
+                                fetchBook(bookID: item.bookID)
                             }) {
                                 ActivityPostView(item: item)
                             }
@@ -105,15 +106,16 @@ struct ListView: View {
                 trailingToolbarItem
             }
             .sheet(isPresented: $sheetIsPresented) {
-                BookSearchView(book: Book())
+                BookSearchView()
             }
             .navigationDestination(isPresented: $isBookDetailViewPresented) {
-                if let selectedItem = selectedItem {
+                if let selectedItem = selectedItem, let selectedBook = selectedBook {
                     BookDetailView(
-                        book: selectedItem.bookVM.book ?? Book(),
+                        bookVM: bookVM,
                         resultsVM: ResultsListViewModel(),
-                        bookID: selectedItem.bookVM.bookID,
-                        activityType: selectedItem.bookVM.type,
+                        book: selectedBook,
+                        bookID: selectedItem.bookID,
+                        activityType: selectedItem.type,
                         fromAPI: false,
                         fromListView: true
                     )
@@ -144,6 +146,23 @@ struct ListView: View {
             }
         }
     }
+    
+    private func fetchBook(bookID: String) {
+        Task {
+            do {
+                if let book = try await FirestoreService.shared.fetchBook(byID: bookID) {
+                    DispatchQueue.main.async {
+                        self.selectedBook = book
+                        self.isBookDetailViewPresented = true
+                    }
+                } else {
+                    print("Document does not exist")
+                }
+            } catch {
+                print("Error fetching book: \(error.localizedDescription)")
+            }
+        }
+    }
 }
 
 struct ListView_Previews: PreviewProvider {
@@ -153,4 +172,3 @@ struct ListView_Previews: PreviewProvider {
         }
     }
 }
-

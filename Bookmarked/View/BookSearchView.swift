@@ -22,13 +22,14 @@ struct SearchBar: View {
 }
 
 struct BookSearchView: View {
-    @EnvironmentObject var bookVM: BookViewModel
     @Environment(\.dismiss) private var dismiss
-    @State var book: Book
-    @EnvironmentObject var favoritesVM: FavoritesViewModel
+    @State private var book = Book()
+    @StateObject var favoritesVM = FavoritesViewModel()
+    @StateObject var reviewVM = ReviewViewModel()
     @StateObject private var resultsListVM = ResultsListViewModel()
 
     @State private var searchText: String = ""
+    @State private var selectedBookID: String?
 
     private var isShowingError: Binding<Bool> {
         .init(
@@ -38,18 +39,18 @@ struct BookSearchView: View {
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 SearchBar(text: $searchText)
                     .padding(.horizontal)
                 
                 List(resultsListVM.books, id: \.id) { resultViewModel in
-                    NavigationLink(destination: {
-                        //print("Navigating to BookDetailView with bookID from API: \(resultViewModel.id ?? "N/A")")
-                        return BookDetailView(book: resultViewModel.book, resultsVM: resultsListVM, bookID: resultViewModel.id ?? "", activityType: .review, fromAPI: true)
-                    }(), label: {
-                        BookRow(resultViewModel: resultViewModel)
-                    })
+                    NavigationLink(
+                        value: resultViewModel.book.id ?? "nil",
+                        label: {
+                            BookRow(resultViewModel: resultViewModel)
+                        }
+                    )
                 }
                 .listStyle(.plain)
                 .onChange(of: searchText) { value in
@@ -69,17 +70,43 @@ struct BookSearchView: View {
             } message: {
                 Text(resultsListVM.fetchError?.localizedDescription ?? "An unknown error occurred during the search.")
             }
+            .navigationDestination(for: String.self) { bookID in
+                if let resultViewModel = resultsListVM.books.first(where: { $0.book.id == bookID }) {
+                    createBookDetailView(for: resultViewModel)
+                }
+            }
         }
     }
-}
+    
+    private func createBookDetailView(for resultViewModel: ResultsViewModel) -> some View {
+        //print("Navigating to BookDetailView with bookID: \(String(describing: resultViewModel.id))")
+        
+        // Update the book state before navigation
+        DispatchQueue.main.async {
+            self.book = resultViewModel.book
+        }
 
+        let bookVM = BookViewModel()
+        
+        return BookDetailView(
+            bookVM: bookVM,
+            resultsVM: resultsListVM,
+            book: resultViewModel.book,
+            bookID: resultViewModel.book.id ?? "nil",
+            activityType: .review,
+            fromAPI: true,
+            fromListView: false
+        )
+        .environmentObject(favoritesVM)
+        .environmentObject(reviewVM)
+    }
+}
 
 private struct BookRow: View {
     let resultViewModel: ResultsViewModel
     
     var body: some View {
         HStack {
-            // Thumbnail
             if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
                 AsyncImage(url: url) { phase in
                     switch phase {
@@ -96,15 +123,22 @@ private struct BookRow: View {
                 }
                 .frame(width: 50, height: 80)
                 .cornerRadius(8)
-            }
-            else {
-                Rectangle()
-                    .fill(Color.gray)
-                    .frame(width: 50, height: 80)
-                    .cornerRadius(8)
+            } else {
+                VStack {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(.gray)
+                    Text("No Image")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .frame(width: 50, height: 80)
+                .background(Color(.systemGray5))
+                .cornerRadius(8)
             }
             
-            // Book Info
             VStack(alignment: .leading) {
                 Text(resultViewModel.title)
                 Text(resultViewModel.authors)
@@ -122,10 +156,10 @@ private struct BookRow: View {
 struct BookSearchView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            BookSearchView(book: Book())
+            BookSearchView()
                 .environmentObject(BookViewModel())
                 .environmentObject(FavoritesViewModel())
+                .environmentObject(ReviewViewModel())
         }
     }
 }
-

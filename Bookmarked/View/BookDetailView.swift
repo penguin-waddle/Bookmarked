@@ -11,58 +11,57 @@ import FirebaseFirestore
 import FirebaseAuth
 
 struct BookDetailView: View {
-    @EnvironmentObject var bookVM: BookViewModel
-   // @State var book: Book
+    @ObservedObject var bookVM: BookViewModel
     @ObservedObject var resultsVM: ResultsListViewModel
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     @EnvironmentObject var reviewVM: ReviewViewModel
-    
+
+    @State var book: Book
     var bookID: String
     var activityType: ActivityType
-    var fromAPI: Bool = false
-    var fromListView: Bool = false
-    
+    var fromAPI: Bool
+    var fromListView: Bool
+
     @State private var isDescriptionExpanded = false
     @State private var showReviewViewSheet = false
     @State private var showErrorAlert: Bool = false
     var previewRunning = false
-    
+
     var body: some View {
         List {
             Section(header: EmptyView()) {
                 HStack(alignment: .top) {
                     Text("") // Empty text for divider to span whole view
-                    // Display the cover image if the imageUrl is available
-                    if let imageUrl = bookVM.book.imageUrl, let url = URL(string: imageUrl) {
+                    if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
                         WebImage(url: url)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 100)
                             .cornerRadius(10)
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(bookVM.book.title)
+                        Text(book.title)
                             .font(.title)
                             .fontWeight(.bold)
                         
-                        Text("By \(bookVM.book.author)")
+                        Text("By \(book.author)")
                             .font(.title2)
                             .foregroundColor(.secondary)
                         
-                        if let pageCount = bookVM.book.pageCount {
+                        if let pageCount = book.pageCount {
                             Text(pageCount > 0 ? "\(pageCount) pages" : "")
                                 .foregroundColor(.secondary)
                                 .font(.subheadline)
                         }
                         
-                        if let categories = bookVM.book.categories {
+                        if let categories = book.categories {
                             Text(categories.joined(separator: ", "))
                                 .foregroundColor(.secondary)
                                 .font(.subheadline)
                         }
                         
-                        if let publishedDate = bookVM.book.publishedDate {
+                        if let publishedDate = book.publishedDate {
                             Text("Published \(formatDate(publishedDate))")
                                 .font(.footnote)
                                 .foregroundColor(.secondary)
@@ -73,12 +72,12 @@ struct BookDetailView: View {
                 .listRowInsets(EdgeInsets())
                 .padding()
                 
-                if let description = bookVM.book.description {
+                if let description = book.description {
                     Group {
                         if isDescriptionExpanded || description.split(separator: " ").count <= 50 {
                             Text(description)
                         } else {
-                            Text(String(description.prefix(300)) + "...") // Show first 300 characters as an example
+                            Text(String(description.prefix(300)) + "...")
                         }
                     }
                     
@@ -94,9 +93,9 @@ struct BookDetailView: View {
                     }
                 }
             }
-            
+
             Section {
-                ReviewsListView(book: bookVM.book, handleBookRating: handleBookRating)
+                ReviewsListView(book: book, handleBookRating: handleBookRating)
             }
             .listRowInsets(EdgeInsets())
         }
@@ -105,13 +104,14 @@ struct BookDetailView: View {
         .font(.custom("PingFangTC-Regular", size: 16))
         .onAppear {
             print("BookDetailView appeared for bookID: \(bookID), fromAPI: \(fromAPI)")
+            reviewVM.resetData()
             Task {
                 if fromAPI {
                     print("Fetching data from API")
                     await bookVM.fetchBookData(bookID: bookID, firestoreId: nil, fromAPI: true, resultsVM: resultsVM)
-                    if let firestoreId = await bookVM.checkAndSetFirestoreIdForBook(book: bookVM.book) {
+                    if let firestoreId = await bookVM.checkAndSetFirestoreIdForBook(book: book) {
                         DispatchQueue.main.async {
-                            self.bookVM.book.firestoreId = firestoreId
+                            self.book.firestoreId = firestoreId
                             print("Book firestoreId set: \(firestoreId)")
                             favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser!.uid, firestoreId: firestoreId)
                         }
@@ -129,8 +129,8 @@ struct BookDetailView: View {
                         await reviewVM.fetchReviews(for: bookID)
                     } else {
                         print("Fetching data normally")
-                        await bookVM.fetchBookData(bookID: bookID, firestoreId: bookVM.book.firestoreId, fromAPI: false)
-                        if let firestoreId = bookVM.book.firestoreId {
+                        await bookVM.fetchBookData(bookID: book.id, firestoreId: book.firestoreId, fromAPI: false)
+                        if let firestoreId = book.firestoreId {
                             favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser!.uid, firestoreId: firestoreId)
                             await reviewVM.fetchReviews(for: firestoreId)
                         }
@@ -139,11 +139,9 @@ struct BookDetailView: View {
             }
         }
         .onDisappear {
-            // Reset view state here
             isDescriptionExpanded = false
             bookVM.resetDataFetchedFlag()
         }
-        
         .alert("Error", isPresented: $showErrorAlert) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -151,12 +149,11 @@ struct BookDetailView: View {
         }
         .sheet(isPresented: $showReviewViewSheet) {
             NavigationStack {
-                ReviewView(book: bookVM.book, review: Review())
+                ReviewView(book: book, review: Review())
             }
         }
-        .navigationBarItems(trailing: HeartView(book: bookVM.book, fromAPI: fromAPI))
+        .navigationBarItems(trailing: HeartView(book: book, fromAPI: fromAPI))
     }
-    
     
     struct ReviewsListView: View {
         let book: Book
@@ -205,13 +202,11 @@ struct BookDetailView: View {
         }
     }
     
-    
     func handleBookRating() {
         Task {
-            if let savedBookId = await bookVM.saveBookIfNotExists(book: bookVM.book) {
-                // Update the book's Firestore ID with the returned value
+            if let savedBookId = await bookVM.saveBookIfNotExists(book: book) {
                 DispatchQueue.main.async {
-                    self.bookVM.book.firestoreId = savedBookId
+                    self.book.firestoreId = savedBookId
                     self.showReviewViewSheet.toggle()
                     print("Book confirmed saved or found with Firestore ID: \(savedBookId)")
                 }
@@ -222,46 +217,40 @@ struct BookDetailView: View {
     }
     
     func formatDate(_ dateString: String) -> String {
-        // Create a date formatter to parse the date string
         let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd" // Assuming the original format is this
-        
-        // Check if we can create a Date object from the string
+        inputFormatter.dateFormat = "yyyy-MM-dd"
         if let date = inputFormatter.date(from: dateString) {
-            // Format the date object to the desired format
             let outputFormatter = DateFormatter()
             outputFormatter.dateFormat = "MMMM dd, yyyy"
             return outputFormatter.string(from: date)
         } else {
-            // If we cannot create a Date object, return the original string
             return dateString
         }
     }
 }
 
+
 struct BookDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        // Create dummy data for the preview
         let sampleBook = Book(
-            id: "SampleBook"
-
+            id: "SampleBookID",
             title: "Sample Book Title",
             author: "Sample Author"
-            // ... include other necessary properties if needed
         )
         
         let resultsVM = ResultsListViewModel()
-        let firestoreService = FirestoreService.shared // Ensure this is initialized correctly for the preview
+        let firestoreService = FirestoreService.shared
         
-        // Initialize the BookDetailView with the necessary parameters
         BookDetailView (
-            //book: sampleBook,
+            bookVM: BookViewModel(),
             resultsVM: resultsVM,
-            bookID: sampleBook.id ?? "",
+            book: sampleBook,
+            bookID: "1234",
             activityType: .review,
-            fromAPI: false
+            fromAPI: false,
+            fromListView: true
         )
-        .environmentObject(firestoreService) // Provide the environment object if needed
+        .environmentObject(firestoreService)
     }
 }
 
