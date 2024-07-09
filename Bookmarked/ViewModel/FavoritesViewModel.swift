@@ -117,20 +117,22 @@ class FavoritesViewModel: ObservableObject {
 
     
     func fetchFavorites(userId: String) async {
-        isLoading = true
-        do {
-            let books = try await firestoreService.fetchFavorites(userId: userId)
-            DispatchQueue.main.async {  // Ensure updates on the main thread
-                self.favorites = books
-                self.isLoading = false
-            }
-        } catch {
-            DispatchQueue.main.async {
-                self.error = error
-                self.isLoading = false
-            }
-        }
-    }
+         DispatchQueue.main.async {
+             self.isLoading = true
+         }
+         do {
+             let books = try await firestoreService.fetchFavorites(userId: userId)
+             DispatchQueue.main.async {
+                 self.favorites = books
+                 self.isLoading = false
+             }
+         } catch {
+             DispatchQueue.main.async {
+                 self.error = error
+                 self.isLoading = false
+             }
+         }
+     }
     
     func resetData() {
         DispatchQueue.main.async {

@@ -4,9 +4,11 @@
 //
 //  Created by Vivien on 1/15/24.
 //
+import FirebaseFirestore
 import FirebaseAuth
 import SwiftUI
 import SDWebImageSwiftUI
+import SlidingTabView
 
 struct UserReviewsListView: View {
     @ObservedObject var reviewViewModel: ReviewViewModel
@@ -14,73 +16,98 @@ struct UserReviewsListView: View {
 
     var body: some View {
         List(reviewViewModel.reviews, id: \.id) { review in
-            NavigationLink(destination: ReviewView(book: reviewViewModel.reviewBooks[review.id ?? ""] ?? Book(), review: review)) {
-                Text(review.title)
+            if let bookID = review.bookID {
+                NavigationLink(destination: BookDetailViewWrapper(book: Book(), bookID: bookID)) {
+                    BookReviewRowView(review: review)
+                }
             }
         }
         .onAppear {
+            print("UserReviewsListView onAppear called with reviews: \(reviewViewModel.reviews)")
             Task {
-                await reviewViewModel.fetchReviewsByUser(userId: userId)
+                await reviewViewModel.fetchReviewsForUser(userId: userId)
+                print("Fetched reviews: \(reviewViewModel.reviews)")
             }
+        }
+        .onChange(of: reviewViewModel.reviews) { newReviews in
+            print("Reviews updated: \(newReviews)")
         }
     }
 }
 
 struct UserProfileView: View {
-    @ObservedObject var userViewModel: UserViewModel
+    @ObservedObject var userVM: UserViewModel
     @StateObject var reviewViewModel = ReviewViewModel()
     @StateObject var favoritesViewModel = FavoritesViewModel()
+    @State private var tabIndex = 0
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .center, spacing: 20) {
                 // Profile picture
-                WebImage(url: URL(string: userViewModel.user?.profilePictureURL ?? ""))
+                WebImage(url: URL(string: userVM.user?.profilePictureURL ?? ""))
                     .resizable()
-                    .placeholder(Image(systemName: "person.circle"))
+                    .placeholder {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .overlay(
+                                Image(systemName: "person.fill")
+                                    .foregroundColor(.gray)
+                                    .font(.system(size: 75))
+                            )
+                            .frame(width: 150, height: 150)
+                    }
                     .indicator(.activity)
                     .transition(.fade(duration: 0.5))
                     .scaledToFit()
-                    .frame(width: 100, height: 100)
+                    .frame(width: 150, height: 150)
                     .clipShape(Circle())
+                    .padding(.top)
 
                 // User's name and username
-                Text(userViewModel.user?.name ?? "Name")
+                Text(userVM.user?.name ?? "Name")
                     .font(.title)
                     .fontWeight(.bold)
-                Text("@\(userViewModel.user?.username ?? "username")")
+                Text("@\(userVM.user?.username ?? "username")")
                     .font(.subheadline)
                     .foregroundColor(.gray)
 
                 // Bio
-                Text(userViewModel.user?.bio ?? "No Bio")
+                Text(userVM.user?.bio ?? "No Bio")
                     .font(.body)
-                    .padding()
+                    .padding(.horizontal)
 
                 // Metrics
-                HStack {
-                    MetricView(title: "Reviews", value: "\(userViewModel.user?.reviews.count ?? 0)")
-                    MetricView(title: "Favorites", value: "\(userViewModel.user?.favorites.count ?? 0)")
-                    MetricView(title: "Readlists", value: "\(userViewModel.user?.readLists.count ?? 0)")
+                HStack(spacing: 100) {
+                    MetricView(title: "Followers", value: "\(userVM.user?.followers.count ?? 0)")
+                    MetricView(title: "Following", value: "\(userVM.user?.following.count ?? 0)")
                 }
 
-                // Tabs for bookshelves (Reviews, Favorites, ReadLists)
-                TabView {
-                    UserReviewsListView(reviewViewModel: reviewViewModel, userId: userViewModel.user?.id ?? "")
-                            .tabItem { Label("Reviews", systemImage: "star") }
-
-                    BookShelfView(books: favoritesViewModel.favorites)
-                            .tabItem { Label("Favorites", systemImage: "heart") }
+                // Tabs for bookshelves (Reviews, Favorites)
+                VStack {
+                    SlidingTabView(selection: $tabIndex,
+                                    tabs: ["Reviews (\(reviewViewModel.reviews.count))",
+                                           "Favorites (\(favoritesViewModel.favorites.count))"],
+                                    animation: .easeInOut)
+                    
+                    if tabIndex == 0 {
+                        UserReviewsListView(reviewViewModel: reviewViewModel, userId: userVM.user?.id ?? "")
+                    } else if tabIndex == 1 {
+                        BookShelfView(books: favoritesViewModel.favorites)
+                    }
                 }
-                .frame(height: 300)
+                .padding(.horizontal)
+                Spacer()
             }
+            .padding(.top, 40)
+            .padding(.horizontal)
         }
         .onAppear {
             let userId = Auth.auth().currentUser?.uid ?? ""
-            userViewModel.fetchUserData(userId: userId)
+            userVM.fetchUserData(userId: userId)
 
             Task {
-                await reviewViewModel.fetchReviewsByUser(userId: userId)
+                await reviewViewModel.fetchReviewsForUser(userId: userId)
                 await favoritesViewModel.fetchFavorites(userId: userId)
             }
         }
@@ -89,5 +116,6 @@ struct UserProfileView: View {
 
 
 #Preview {
-    UserProfileView(userViewModel: UserViewModel())
+    UserProfileView(userVM: UserViewModel())
 }
+

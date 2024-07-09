@@ -69,9 +69,13 @@ class MockFirestoreService: FirestoreServiceProtocol {
         return reviews[firestoreId] ?? []
     }
 
-    func fetchReviewsByUser(userId: String) async throws -> [Review] {
-        let allReviews = reviews.values.flatMap { $0 }
-        return allReviews.filter { $0.userId == userId }
+    func fetchReviewsForUser(userId: String) async throws -> [Review] {
+        var allReviews: [Review] = []
+        for bookReviews in reviews.values {
+            let userReviews = bookReviews.filter { $0.userId == userId }
+            allReviews.append(contentsOf: userReviews)
+        }
+        return allReviews
     }
 
     func fetchFavorites(userId: String) async throws -> [Book] {

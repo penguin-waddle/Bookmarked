@@ -17,7 +17,7 @@ protocol FirestoreServiceProtocol {
     func deleteReview(for book: Book, review: Review) async -> Bool
     func fetchBook(byID bookID: String) async throws -> Book?
     func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review]
-    func fetchReviewsByUser(userId: String) async throws -> [Review]
+    func fetchReviewsForUser(userId: String) async throws -> [Review]
     func getBookId(book: Book, fromAPI: Bool) -> String
     func fetchFavorites(userId: String) async throws -> [Book]
     func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error>
@@ -154,12 +154,22 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
         }
     }
     
-    func fetchReviewsByUser(userId: String) async throws -> [Review] {
-        let reviewsRef = db.collectionGroup("reviews").whereField("userId", isEqualTo: userId)
-        let snapshot = try await reviewsRef.getDocuments()
-        return snapshot.documents.compactMap { document -> Review? in
-            try? document.data(as: Review.self)
+    func fetchReviewsForUser(userId: String) async throws -> [Review] {
+        var allReviews: [Review] = []
+        let booksRef = db.collection("books")
+        let snapshot = try await booksRef.getDocuments()
+        
+        for document in snapshot.documents {
+            let reviewsRef = document.reference.collection("reviews").whereField("userId", isEqualTo: userId)
+            let reviewsSnapshot = try await reviewsRef.getDocuments()
+            let bookReviews = reviewsSnapshot.documents.compactMap { document in
+                try? document.data(as: Review.self)
+            }
+            allReviews.append(contentsOf: bookReviews)
         }
+        
+        print("Fetched reviews: \(allReviews)")
+        return allReviews
     }
     
     func getBookId(book: Book, fromAPI: Bool) -> String {

@@ -104,7 +104,7 @@ struct BookSearchView: View {
 
 private struct BookRow: View {
     let resultViewModel: ResultsViewModel
-    
+
     var body: some View {
         HStack {
             if let thumbnail = resultViewModel.image, let url = URL(string: thumbnail) {
@@ -113,10 +113,10 @@ private struct BookRow: View {
                     case .success(let image):
                         image.resizable()
                             .scaledToFit()
-                    case .empty, .failure:
-                        Rectangle()
-                            .fill(Color.gray)
-                            .frame(width: 50, height: 80)
+                    case .empty:
+                        placeholderImage
+                    case .failure:
+                        placeholderImage
                     @unknown default:
                         EmptyView()
                     }
@@ -124,21 +124,9 @@ private struct BookRow: View {
                 .frame(width: 50, height: 80)
                 .cornerRadius(8)
             } else {
-                VStack {
-                    Image(systemName: "photo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24, height: 24)
-                        .foregroundColor(.gray)
-                    Text("No Image")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                .frame(width: 50, height: 80)
-                .background(Color(.systemGray5))
-                .cornerRadius(8)
+                placeholderImage
             }
-            
+
             VStack(alignment: .leading) {
                 Text(resultViewModel.title)
                 Text(resultViewModel.authors)
@@ -150,6 +138,22 @@ private struct BookRow: View {
                     .foregroundColor(.secondary)
             }
         }
+    }
+
+    private var placeholderImage: some View {
+        VStack {
+            Image(systemName: "photo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
+                .foregroundColor(.gray)
+            Text("No Image")
+                .font(.caption)
+                .foregroundColor(.gray)
+        }
+        .frame(width: 50, height: 80)
+        .background(Color(.systemGray5))
+        .cornerRadius(8)
     }
 }
 

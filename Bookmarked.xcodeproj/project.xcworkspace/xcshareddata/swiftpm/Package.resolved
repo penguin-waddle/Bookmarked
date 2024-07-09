@@ -1,5 +1,5 @@
 {
-  "originHash" : "8aa166c7be794b67c0165ed2c1bfd8d4c566b25f812e846817e12406356b58cb",
+  "originHash" : "bb04b28c21eb3c9abf634ebe407dc0ba9c0c618331e938a1f73119dfe9a74f9a",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -125,6 +125,15 @@
       "state" : {
         "revision" : "e837c37d45449fbd3b4745c10c5b5274e73edead",
         "version" : "2.2.3"
+      }
+    },
+    {
+      "identity" : "slidingtabview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/QuynhNguyen/SlidingTabView",
+      "state" : {
+        "revision" : "b0f0662977418824d50546b2850a523dcd793bb0",
+        "version" : "1.0.2"
       }
     },
     {

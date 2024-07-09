@@ -123,7 +123,7 @@ struct LoginView: View {
                 }
             }
             .fullScreenCover(isPresented: $presentSheet) {
-                ListView()
+                MainTabView()
             }
         }
         .background(LinearGradient(gradient: Gradient(colors: [Color.white, Color.blue.opacity(0.3)]), startPoint: .top, endPoint: .bottom))

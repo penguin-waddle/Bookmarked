@@ -17,4 +17,6 @@ struct User {
     var favorites: [String]
     var reviews: [String]
     var readLists: [String]
+    var followers: [String]
+    var following: [String]
 }

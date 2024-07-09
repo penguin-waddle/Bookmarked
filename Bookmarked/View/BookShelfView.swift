@@ -55,16 +55,20 @@ struct BookDetailViewWrapper: View {
         BookDetailView(
             bookVM: bookVM,
             resultsVM: ResultsListViewModel(),
-            book: book, 
+            book: book,
             bookID: bookID,
             activityType: .review,
             fromAPI: false,
             fromListView: true
         )
         .onAppear {
-            bookVM.book = book
-            favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser!.uid, firestoreId: bookID)
             Task {
+                if let fetchedBook = try? await FirestoreService.shared.fetchBook(byID: bookID) {
+                    DispatchQueue.main.async {
+                        bookVM.book = fetchedBook
+                    }
+                }
+                favoritesVM.checkIfBookIsFavorite(userId: Auth.auth().currentUser?.uid ?? "", firestoreId: bookID)
                 await reviewVM.fetchReviews(for: bookID)
             }
         }

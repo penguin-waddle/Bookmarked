@@ -38,6 +38,8 @@
 		1EB182E22B55E2220027105A /* MetricView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB182E12B55E2220027105A /* MetricView.swift */; };
 		1EB182E42B55E2510027105A /* BookShelfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB182E32B55E2510027105A /* BookShelfView.swift */; };
 		1EBE2DF42C25C52A0012F423 /* ExpandableText in Frameworks */ = {isa = PBXBuildFile; productRef = 1EBE2DF32C25C52A0012F423 /* ExpandableText */; };
+		1EBE2DF62C2E1B180012F423 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EBE2DF52C2E1B180012F423 /* MainTabView.swift */; };
+		1EBE2DFB2C3C6B3E0012F423 /* SlidingTabView in Frameworks */ = {isa = PBXBuildFile; productRef = 1EBE2DFA2C3C6B3E0012F423 /* SlidingTabView */; };
 		1EC4980B2AE71CD70056F30E /* BookmarkedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */; };
 		1EC498122AE71D2A0056F30E /* BookSearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC498112AE71D2A0056F30E /* BookSearchTests.swift */; };
 		1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDC31312AB3BD8800D6C952 /* BookDetailView.swift */; };
@@ -87,6 +89,8 @@
 		1EB182DF2B55D80D0027105A /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
 		1EB182E12B55E2220027105A /* MetricView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricView.swift; sourceTree = "<group>"; };
 		1EB182E32B55E2510027105A /* BookShelfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookShelfView.swift; sourceTree = "<group>"; };
+		1EBE2DF52C2E1B180012F423 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		1EBE2DF72C3496A00012F423 /* CoreAudioTypes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioTypes.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/System/Library/Frameworks/CoreAudioTypes.framework; sourceTree = DEVELOPER_DIR; };
 		1EC498082AE71CD70056F30E /* BookmarkedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookmarkedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1EC4980A2AE71CD70056F30E /* BookmarkedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedTests.swift; sourceTree = "<group>"; };
 		1EC498112AE71D2A0056F30E /* BookSearchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookSearchTests.swift; sourceTree = "<group>"; };
@@ -104,6 +108,7 @@
 			files = (
 				1EBE2DF42C25C52A0012F423 /* ExpandableText in Frameworks */,
 				1EDC31352AB3C63100D6C952 /* SDWebImageSwiftUI in Frameworks */,
+				1EBE2DFB2C3C6B3E0012F423 /* SlidingTabView in Frameworks */,
 				1E5BCBC42A95505F00C0A1D6 /* FirebaseAuth in Frameworks */,
 				1E5BCBCA2A95505F00C0A1D6 /* FirebaseStorage in Frameworks */,
 				1E023C452B06B1F8003A7B4E /* FirebaseFunctions in Frameworks */,
@@ -169,6 +174,7 @@
 		1EBE2DF12C25C4630012F423 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1EBE2DF72C3496A00012F423 /* CoreAudioTypes.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -216,6 +222,7 @@
 				1E8B6F4C2A9684CA00EAB91A /* BookSearchView.swift */,
 				1E5BCBCD2A958C2A00C0A1D6 /* ListView.swift */,
 				1E95BDA52A9540FE005B4D0D /* LoginView.swift */,
+				1EBE2DF52C2E1B180012F423 /* MainTabView.swift */,
 				1EB182E12B55E2220027105A /* MetricView.swift */,
 				1EB182E32B55E2510027105A /* BookShelfView.swift */,
 				1E967DAB2AC754C400D63D1B /* HeartView.swift */,
@@ -260,6 +267,7 @@
 				1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */,
 				1E023C442B06B1F8003A7B4E /* FirebaseFunctions */,
 				1EBE2DF32C25C52A0012F423 /* ExpandableText */,
+				1EBE2DFA2C3C6B3E0012F423 /* SlidingTabView */,
 			);
 			productName = Bookmarked;
 			productReference = 1E95BDA02A9540FE005B4D0D /* Bookmarked.app */;
@@ -315,6 +323,7 @@
 				1E5BCBC22A95505F00C0A1D6 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 				1EBE2DF22C25C5290012F423 /* XCRemoteSwiftPackageReference "ExpandableText" */,
+				1EBE2DF92C3C6B3E0012F423 /* XCRemoteSwiftPackageReference "SlidingTabView" */,
 			);
 			productRefGroup = 1E95BDA12A9540FE005B4D0D /* Products */;
 			projectDirPath = "";
@@ -358,6 +367,7 @@
 				1E53706A2AB90DE5005B3D8D /* BookReviewRowView.swift in Sources */,
 				1E99B7382B587BEC00AB10CD /* FavoritesViewModel.swift in Sources */,
 				1E5370682AB8E83D005B3D8D /* ReviewViewModel.swift in Sources */,
+				1EBE2DF62C2E1B180012F423 /* MainTabView.swift in Sources */,
 				1EB182E42B55E2510027105A /* BookShelfView.swift in Sources */,
 				1E85FBDF2AD4D1D0003DA2BB /* ActivityFeedItem.swift in Sources */,
 				1EDC31322AB3BD8800D6C952 /* BookDetailView.swift in Sources */,
@@ -547,7 +557,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "-Wl,-ld_classic";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.Bookmarked";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -589,7 +599,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "-Wl,-ld_classic";
+				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "Vivien-Quach.Bookmarked";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -697,6 +707,14 @@
 				minimumVersion = 1.2.0;
 			};
 		};
+		1EBE2DF92C3C6B3E0012F423 /* XCRemoteSwiftPackageReference "SlidingTabView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/QuynhNguyen/SlidingTabView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
 		1EDC31332AB3C63100D6C952 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
@@ -737,6 +755,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1EBE2DF22C25C5290012F423 /* XCRemoteSwiftPackageReference "ExpandableText" */;
 			productName = ExpandableText;
+		};
+		1EBE2DFA2C3C6B3E0012F423 /* SlidingTabView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EBE2DF92C3C6B3E0012F423 /* XCRemoteSwiftPackageReference "SlidingTabView" */;
+			productName = SlidingTabView;
 		};
 		1EDC31342AB3C63100D6C952 /* SDWebImageSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;

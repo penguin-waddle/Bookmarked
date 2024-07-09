@@ -67,16 +67,15 @@ class ReviewViewModel: ObservableObject {
         }
     }
 
-    func fetchReviewsByUser(userId: String) async {
+    func fetchReviewsForUser(userId: String) async {
         do {
-            let fetchedReviews = try await firestoreService.fetchReviewsByUser(userId: userId)
+            let fetchedReviews = try await firestoreService.fetchReviewsForUser(userId: userId)
+            print("Fetched reviews: \(fetchedReviews)")
             DispatchQueue.main.async {
                 self.reviews = fetchedReviews
             }
         } catch {
-            DispatchQueue.main.async {
-                self.error = error
-            }
+            print("Error fetching reviews for user: \(error)")
         }
     }
     

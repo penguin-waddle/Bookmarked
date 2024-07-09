@@ -19,11 +19,12 @@ struct MetricView: View {
                 .font(.caption)
                 .foregroundColor(.gray)
         }
+        .padding()
     }
 }
 
 #Preview {
-    MetricView(title: "Reviews", value: "57")
+    MetricView(title: "Followers", value: "57")
                 .previewLayout(.sizeThatFits)
                 .padding()
 }

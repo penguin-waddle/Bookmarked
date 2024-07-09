@@ -16,9 +16,9 @@ class UserViewModel: ObservableObject {
         let userRef = db.collection("users").document(userId)
 
         userRef.getDocument { (document, error) in
-            if let document = document, document.exists {
-                let userData = document.data()
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                if let document = document, document.exists {
+                    let userData = document.data()
                     self.user = User(
                         id: userId,
                         name: userData?["name"] as? String ?? "",
@@ -28,11 +28,13 @@ class UserViewModel: ObservableObject {
                         bio: userData?["bio"] as? String ?? "",
                         favorites: userData?["favorites"] as? [String] ?? [],
                         reviews: userData?["reviews"] as? [String] ?? [],
-                        readLists: userData?["readLists"] as? [String] ?? []
+                        readLists: userData?["readLists"] as? [String] ?? [],
+                        followers: userData?["followers"] as? [String] ?? [], 
+                        following: userData?["following"] as? [String] ?? []
                     )
+                } else {
+                    print("Document does not exist")
                 }
-            } else {
-                print("Document does not exist")
             }
         }
     }
@@ -49,7 +51,9 @@ class UserViewModel: ObservableObject {
             "bio": updatedUser.bio,
             "favorites": updatedUser.favorites,
             "reviews": updatedUser.reviews,
-            "readLists": updatedUser.readLists
+            "readLists": updatedUser.readLists,
+            "followers": updatedUser.followers,
+            "following": updatedUser.following
         ]) { error in
             if let error = error {
                 print("Error updating user: \(error.localizedDescription)")
