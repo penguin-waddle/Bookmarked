@@ -11,10 +11,10 @@ This project showcases my iOS development skills and commitment to creating feat
 <table>
   <tr>
     <td>
-      <img src="https://github.com/user-attachments/assets/91369c42-e298-436e-a87d-53596f157f55" width="720" /> 
+      <img src="https://github.com/user-attachments/assets/91369c42-e298-436e-a87d-53596f157f55" width="900" /> 
     </td>
     <td>
-      <img src="https://github.com/user-attachments/assets/453c97db-3ee2-46cf-b32f-87c32a05266a" width="720" /> 
+      <img src="https://github.com/user-attachments/assets/453c97db-3ee2-46cf-b32f-87c32a05266a" width="900" /> 
     </td>
     <td>
       <p>Here's a quick look at <strong>Bookmarked</strong> in action. The first GIF shows the process of logging in, searching for a book, and favoriting it. The second GIF showcases how users can leave reviews for books they've read.</p>
