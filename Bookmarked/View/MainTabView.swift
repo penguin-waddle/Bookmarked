@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject var favoritesVM = FavoritesViewModel()
-    @StateObject var reviewVM = ReviewViewModel()
-    @StateObject var bookVM = BookViewModel()
-    @StateObject var userVM = UserViewModel()
+    @StateObject var favoritesVM = FavoritesViewModel(firestoreService: FirestoreService.shared)
+    @StateObject var reviewVM = ReviewViewModel(firestoreService: FirestoreService.shared)
+    @StateObject var bookVM = BookViewModel(firestoreService: FirestoreService.shared)
+    @StateObject var userVM = UserViewModel(firestoreService: FirestoreService.shared)
 
     var body: some View {
         TabView {
@@ -21,6 +21,8 @@ struct MainTabView: View {
                 }
                 .environmentObject(favoritesVM)
                 .environmentObject(bookVM)
+                .environmentObject(reviewVM)
+                .environmentObject(userVM)
 
             BookSearchView()
                 .tabItem {
@@ -28,11 +30,15 @@ struct MainTabView: View {
                 }
                 .environmentObject(favoritesVM)
                 .environmentObject(reviewVM)
+                .environmentObject(userVM)
 
-            UserProfileView(userVM: userVM)
+            UserProfileView()
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle")
                 }
+                .environmentObject(favoritesVM)
+                .environmentObject(reviewVM)
+                .environmentObject(bookVM)
                 .environmentObject(userVM)
         }
     }
@@ -40,5 +46,7 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .environmentObject(UserViewModel(firestoreService: FirestoreService.shared))
 }
+
 

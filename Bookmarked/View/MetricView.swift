@@ -19,7 +19,6 @@ struct MetricView: View {
                 .font(.caption)
                 .foregroundColor(.gray)
         }
-        .padding()
     }
 }
 

@@ -10,6 +10,7 @@ import Firebase
 import FirebaseFirestore
 import Combine
 
+@MainActor
 class FavoritesViewModel: ObservableObject {
     private var firestoreService: FirestoreServiceProtocol
     @Published var favorites: [Book] = []
@@ -93,6 +94,9 @@ class FavoritesViewModel: ObservableObject {
                         )
                     }
                 }
+                .handleEvents(receiveOutput: { [weak self] newStatus in
+                    self?.updateUserFavorites(userId: userId, firestoreId: firestoreId, isFavorite: newStatus)
+                })
                 .sink(
                     receiveCompletion: { completion in
                         DispatchQueue.main.async {
@@ -108,32 +112,40 @@ class FavoritesViewModel: ObservableObject {
                     },
                     receiveValue: { newStatus in
                         print("Favorite status after toggle:", newStatus)
-                        self.isFavorite = newStatus  // Ensure correct update of `isFavorite`
+                        self.isFavorite = newStatus
                     }
                 )
                 .store(in: &self.cancellables)
         }
     }
 
-    
+    private func updateUserFavorites(userId: String, firestoreId: String, isFavorite: Bool) {
+        let userRef = Firestore.firestore().collection("users").document(userId)
+        if isFavorite {
+            userRef.updateData(["favorites": FieldValue.arrayUnion([firestoreId])])
+        } else {
+            userRef.updateData(["favorites": FieldValue.arrayRemove([firestoreId])])
+        }
+    }
+
     func fetchFavorites(userId: String) async {
-         DispatchQueue.main.async {
-             self.isLoading = true
-         }
-         do {
-             let books = try await firestoreService.fetchFavorites(userId: userId)
-             DispatchQueue.main.async {
-                 self.favorites = books
-                 self.isLoading = false
-             }
-         } catch {
-             DispatchQueue.main.async {
-                 self.error = error
-                 self.isLoading = false
-             }
-         }
-     }
-    
+        DispatchQueue.main.async {
+            self.isLoading = true
+        }
+        do {
+            let books = try await firestoreService.fetchFavorites(userId: userId)
+            DispatchQueue.main.async {
+                self.favorites = books
+                self.isLoading = false
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.error = error
+                self.isLoading = false
+            }
+        }
+    }
+
     func resetData() {
         DispatchQueue.main.async {
             self.isFavorite = false
@@ -142,4 +154,5 @@ class FavoritesViewModel: ObservableObject {
         }
     }
 }
+
 

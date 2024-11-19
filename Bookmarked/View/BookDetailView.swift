@@ -147,9 +147,15 @@ struct BookDetailView: View {
         } message: {
             Text(bookVM.fetchError?.localizedDescription ?? "An unknown error occurred")
         }
-        .sheet(isPresented: $showReviewViewSheet) {
+        .sheet(isPresented: $showReviewViewSheet, onDismiss: {
+            Task {
+                if let firestoreId = book.firestoreId {
+                    await reviewVM.fetchReviews(for: firestoreId)
+                }
+            }
+        }) {
             NavigationStack {
-                ReviewView(book: book, review: Review())
+                ReviewView(book: book, review: Review(), context: .bookDetail)
             }
         }
         .navigationBarItems(trailing: HeartView(book: book, fromAPI: fromAPI))

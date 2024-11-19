@@ -4,49 +4,61 @@
 //
 //  Created by Vivien on 1/15/24.
 //
-
 import SwiftUI
 import SDWebImageSwiftUI
 import FirebaseAuth
 
 struct BookShelfView: View {
     var books: [Book]
-    @EnvironmentObject var bookVM: BookViewModel
+    @EnvironmentObject var userVM: UserViewModel
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 20) {
-            ForEach(books, id: \.self) { book in
-                if let firestoreId = book.firestoreId {
-                    NavigationLink(destination: BookDetailViewWrapper(book: book, bookID: firestoreId)) {
-                        bookThumbnailView(book)
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 20) {
+                ForEach(books) { book in
+                    NavigationLink(destination: BookDetailViewWrapper(book: book, bookID: book.firestoreId ?? "")) {
+                        BookThumbnailView(book: book)
                     }
                 }
             }
+            .padding()
         }
-        .padding()
-    }
-
-    @ViewBuilder
-    private func bookThumbnailView(_ book: Book) -> some View {
-        if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
-            WebImage(url: url)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 100)
-                .cornerRadius(10)
-        } else {
-            Rectangle()
-                .fill(Color.gray)
-                .frame(width: 100, height: 150)
-                .cornerRadius(8)
+        .onAppear {
+            print("BookShelfView appeared with books: \(books)")
         }
     }
 }
+
+struct BookThumbnailView: View {
+    var book: Book
+
+    var body: some View {
+        VStack {
+            if let imageUrl = book.imageUrl, let url = URL(string: imageUrl) {
+                WebImage(url: url)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 100, height: 150)
+                    .cornerRadius(10)
+            } else {
+                Rectangle()
+                    .fill(Color.gray)
+                    .frame(width: 100, height: 150)
+                    .cornerRadius(8)
+            }
+            Text(book.title)
+                .font(.caption)
+                .lineLimit(1)
+        }
+    }
+}
+
 
 struct BookDetailViewWrapper: View {
     @EnvironmentObject var bookVM: BookViewModel
     @EnvironmentObject var favoritesVM: FavoritesViewModel
     @EnvironmentObject var reviewVM: ReviewViewModel
+    @EnvironmentObject var userVM: UserViewModel
 
     let book: Book
     let bookID: String
@@ -88,5 +100,7 @@ struct BookShelfView_Previews: PreviewProvider {
             .environmentObject(BookViewModel())
             .environmentObject(FavoritesViewModel())
             .environmentObject(ReviewViewModel())
+            .environmentObject(UserViewModel())
     }
 }
+

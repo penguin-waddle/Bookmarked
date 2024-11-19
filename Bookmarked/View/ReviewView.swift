@@ -8,6 +8,11 @@
 import SwiftUI
 import Firebase
 
+enum ReviewViewContext {
+    case bookDetail
+    case userProfile
+}
+
 struct ReviewView: View {
     @State var book: Book
     @State var review: Review
@@ -15,6 +20,8 @@ struct ReviewView: View {
     @State private var rateOrReviewerString = "Rate this book:" //otherwise display poster email and date
     @StateObject var reviewVM = ReviewViewModel()
     @Environment(\.dismiss) private var dismiss
+    
+    var context: ReviewViewContext
 
     var body: some View {
         VStack {
@@ -97,11 +104,22 @@ struct ReviewView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         Task {
-                            let success = await reviewVM.saveReview(book:book, review: review)
+                            let success = await reviewVM.saveReview(book: book, review: review)
                             if success {
+                                // Handle fetch based on the context
+                                switch context {
+                                case .bookDetail:
+                                    if let firestoreId = book.firestoreId {
+                                        await reviewVM.fetchReviews(for: firestoreId) // Fetch reviews for the book
+                                    }
+                                case .userProfile:
+                                    if let userId = Auth.auth().currentUser?.uid {
+                                        await reviewVM.fetchReviewsForUser(userId: userId) // Fetch reviews for the user
+                                    }
+                                }
                                 dismiss()
                             } else {
-                                print("Error saving data in ReviewView!")
+                                print("Error saving review!")
                             }
                         }
                     }
@@ -130,7 +148,9 @@ struct ReviewView: View {
 struct ReviewView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
-            ReviewView(book: Book(title: "Atomic Habits", author: "James Clear"), review: Review())
+            ReviewView(book: Book(title: "Atomic Habits", author: "James Clear"),
+                       review: Review(),
+                       context: .bookDetail)
         }
     }
 }

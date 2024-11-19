@@ -4,14 +4,14 @@
 //
 //  Created by Vivien on 11/1/23.
 //
-
 import Foundation
 import Combine
 
 class MockFirestoreService: FirestoreServiceProtocol {
     var books: [String: Book] = [:]
-    var reviews: [String: [Review]] = [:]  // Mapping Firestore ID to reviews
-    var favorites: [String: Bool] = [:]  // Maps Firestore ID to favorite status
+    var reviews: [String: [Review]] = [:]
+    var favorites: [String: Bool] = [:]
+    var userReviews: [String: [ReviewReference]] = [:]
 
     func saveBook(_ book: Book) async throws -> String {
         let firestoreId = book.firestoreId ?? UUID().uuidString
@@ -43,7 +43,16 @@ class MockFirestoreService: FirestoreServiceProtocol {
         var bookReviews = reviews[firestoreId, default: []]
         bookReviews.append(review)
         reviews[firestoreId] = bookReviews
+        await updateUserReviews(userId: review.userId ?? "", bookID: firestoreId, reviewID: review.id ?? "", remove: false)
         return true
+    }
+    
+    func fetchReviewID(for book: Book, review: Review) async -> String? {
+        guard let firestoreId = book.firestoreId else { return nil }
+        if let reviewIndex = reviews[firestoreId]?.firstIndex(where: { $0.userId == review.userId && $0.postedOn == review.postedOn }) {
+            return reviews[firestoreId]?[reviewIndex].id
+        }
+        return nil
     }
 
     func deleteReview(for book: Book, review: Review) async -> Bool {
@@ -51,6 +60,7 @@ class MockFirestoreService: FirestoreServiceProtocol {
             return false
         }
         reviews[firestoreId]?.remove(at: index)
+        await updateUserReviews(userId: review.userId ?? "", bookID: firestoreId, reviewID: review.id ?? "", remove: true)
         return true
     }
 
@@ -60,10 +70,6 @@ class MockFirestoreService: FirestoreServiceProtocol {
         }
         return book
     }
-     
-    func getBookId(book: Book, fromAPI: Bool) -> String {
-        return book.firestoreId ?? UUID().uuidString
-    }
 
     func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review] {
         return reviews[firestoreId] ?? []
@@ -71,11 +77,30 @@ class MockFirestoreService: FirestoreServiceProtocol {
 
     func fetchReviewsForUser(userId: String) async throws -> [Review] {
         var allReviews: [Review] = []
-        for bookReviews in reviews.values {
-            let userReviews = bookReviews.filter { $0.userId == userId }
-            allReviews.append(contentsOf: userReviews)
+        guard let reviewReferences = userReviews[userId] else {
+            return allReviews
+        }
+        
+        for reference in reviewReferences {
+            if let bookReviews = reviews[reference.bookID] {
+                if let review = bookReviews.first(where: { $0.id == reference.reviewID }) {
+                    allReviews.append(review)
+                }
+            }
         }
         return allReviews
+    }
+
+    func fetchBooksForReviews(reviews: [Review]) async throws -> [String: Book] {
+        var booksDict: [String: Book] = [:]
+        for review in reviews {
+            if let bookID = review.bookID {
+                if let book = books[bookID] {
+                    booksDict[bookID] = book
+                }
+            }
+        }
+        return booksDict
     }
 
     func fetchFavorites(userId: String) async throws -> [Book] {
@@ -93,7 +118,23 @@ class MockFirestoreService: FirestoreServiceProtocol {
         return Just(!isFavorite).setFailureType(to: Error.self).eraseToAnyPublisher()
     }
 
+    func updateUserReviews(userId: String, bookID: String, reviewID: String, remove: Bool = false) async {
+        var userReviewReferences = userReviews[userId, default: []]
+        
+        if remove {
+            userReviewReferences.removeAll { $0.bookID == bookID && $0.reviewID == reviewID }
+        } else {
+            userReviewReferences.append(ReviewReference(bookID: bookID, reviewID: reviewID))
+        }
+        
+        userReviews[userId] = userReviewReferences
+    }
+
     enum MockError: Error {
         case notFound
     }
 }
+
+
+
+

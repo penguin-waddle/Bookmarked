@@ -14,11 +14,13 @@ protocol FirestoreServiceProtocol {
     func bookExists(isbn10: String?, isbn13: String?) async -> String?
     func saveBookIfNotExists(book: Book) async -> String?
     func saveReview(for book: Book, review: Review) async -> Bool
+    func updateUserReviews(userId: String, bookID: String, reviewID: String, remove: Bool) async
+    func fetchReviewID(for book: Book, review: Review) async -> String?
     func deleteReview(for book: Book, review: Review) async -> Bool
     func fetchBook(byID bookID: String) async throws -> Book?
     func fetchReviews(forBookWithFirestoreId firestoreId: String) async throws -> [Review]
     func fetchReviewsForUser(userId: String) async throws -> [Review]
-    func getBookId(book: Book, fromAPI: Bool) -> String
+    func fetchBooksForReviews(reviews: [Review]) async throws -> [String: Book]
     func fetchFavorites(userId: String) async throws -> [Book]
     func checkIfBookIsFavorite(userId: String, firestoreId: String) -> AnyPublisher<Bool, Error>
     func toggleFavoriteStatus(userId: String, firestoreId: String, book: Book, isFavorite: Bool) -> AnyPublisher<Bool, Error>
@@ -88,20 +90,20 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
             print("Error: book.firestoreId is nil")
             return false
         }
-        
+
         var updatedReview = review
-        updatedReview.bookID = firestoreId  // Use Firestore ID of the book
-        updatedReview.userId = Auth.auth().currentUser?.uid  // Setting the userId of the review
-        
+        updatedReview.bookID = firestoreId
+        updatedReview.userId = Auth.auth().currentUser?.uid
+
         let collectionPath = "books/\(firestoreId)/reviews"
-        
+
         do {
             if let reviewId = updatedReview.id {
-                // If review has an ID, it exists and should be updated
                 try await db.collection(collectionPath).document(reviewId).setData(updatedReview.dictionary)
             } else {
-                // New review, add it to the collection
-                _ = try await db.collection(collectionPath).addDocument(data: updatedReview.dictionary)
+                let ref = try await db.collection(collectionPath).addDocument(data: updatedReview.dictionary)
+                updatedReview.id = ref.documentID
+                await updateUserReviews(userId: updatedReview.userId ?? "", bookID: firestoreId, reviewID: ref.documentID)
             }
             print("Review saved successfully")
             return true
@@ -110,19 +112,51 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
             return false
         }
     }
+
+    func updateUserReviews(userId: String, bookID: String, reviewID: String, remove: Bool = false) async {
+        let userRef = db.collection("users").document(userId)
+        let reviewReference = ReviewReference(bookID: bookID, reviewID: reviewID).dictionary
+        
+        do {
+            if remove {
+                print("Removing review reference for review ID: \(reviewID) from user: \(userId)")
+                try await userRef.updateData(["reviews": FieldValue.arrayRemove([reviewReference])])
+            } else {
+                print("Adding review reference for review ID: \(reviewID) to user: \(userId)")
+                try await userRef.updateData(["reviews": FieldValue.arrayUnion([reviewReference])])
+            }
+        } catch {
+            print("Error updating user reviews: \(error.localizedDescription)")
+        }
+    }
+    
+    func fetchReviewID(for book: Book, review: Review) async -> String? {
+        let collectionPath = "books/\(book.firestoreId ?? review.bookID ?? "")/reviews"
+        do {
+            let querySnapshot = try await db.collection(collectionPath)
+                .whereField("userId", isEqualTo: review.userId ?? "")
+                .whereField("postedOn", isEqualTo: review.postedOn)
+                .getDocuments()
+            return querySnapshot.documents.first?.documentID
+        } catch {
+            print("Error fetching review ID: \(error)")
+            return nil
+        }
+    }
     
     func deleteReview(for book: Book, review: Review) async -> Bool {
-        guard let bookID = book.id, let reviewID = review.id else {
-            print("Error: book.id = \(book.id ?? "nil"), review.id = \(review.id ?? "nil"). This should not have happened.")
+        guard let bookID = book.firestoreId, let reviewID = review.id else {
+            print("Error: BookID or ReviewID is nil")
             return false
         }
         
         do {
-            let _ = try await db.collection("books").document(bookID).collection("reviews").document(reviewID).delete()
-            print("Document successfully deleted.")
+            print("Deleting review with ID: \(reviewID) from book with ID: \(bookID)")
+            try await db.collection("books").document(bookID).collection("reviews").document(reviewID).delete()
+            print("Successfully deleted review with ID: \(reviewID)")
             return true
         } catch {
-            print("Error: Removing document \(error.localizedDescription)")
+            print("Error deleting review: \(error.localizedDescription)")
             return false
         }
     }
@@ -172,16 +206,15 @@ class FirestoreService: FirestoreServiceProtocol, ObservableObject {
         return allReviews
     }
     
-    func getBookId(book: Book, fromAPI: Bool) -> String {
-        if fromAPI {
-            return book.id ?? ""
-        } else {
-            if let range = book.id?.range(of: "_") {
-                return String(book.id?[range.upperBound...] ?? "")
-            } else {
-                return ""
+    func fetchBooksForReviews(reviews: [Review]) async throws -> [String: Book] {
+        var books: [String: Book] = [:]
+        for review in reviews {
+            if let bookID = review.bookID {
+                let book = try await fetchBook(byID: bookID)
+                books[bookID] = book
             }
         }
+        return books
     }
     
     func fetchFavorites(userId: String) async throws -> [Book] {
